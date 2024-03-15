@@ -1,0 +1,12 @@
+.section {
+  color: var(--mantine-color-elv-gray-9);
+
+  &[data-position="right"] {
+    font-weight: 700;
+    margin-inline-start: 5px;
+  }
+
+  &[data-position="left"] {
+    margin-inline-end: 5px;
+  }
+}

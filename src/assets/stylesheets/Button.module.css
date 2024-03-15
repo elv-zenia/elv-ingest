@@ -1,0 +1,5 @@
+.root {
+  &[data-variant="outline"] {
+    border-width: 2px;
+  }
+}
