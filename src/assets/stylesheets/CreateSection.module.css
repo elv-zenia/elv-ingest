@@ -1,0 +1,13 @@
+.dropdown {
+  padding: 15px 0;
+}
+
+.item {
+  padding: 2px 20px;
+
+  &[data-hovered="true"] {
+    background: var(--mantine-color-elv-neutral-4);
+    border-radius: 0;
+    color: var(--mantine-color-white);
+  }
+}

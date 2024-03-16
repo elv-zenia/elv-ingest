@@ -8,11 +8,13 @@ const ContentItem = () => {
       actions={[
         {
           label: "Back",
-          variant: "filled"
+          variant: "filled",
+          uppercase: true
         },
         {
           label: "Delete This Object",
-          variant: "outline"
+          variant: "outline",
+          uppercase: true
         }
       ]}
     />

@@ -64,3 +64,8 @@ table {
 textarea {
   white-space: revert;
 }
+
+// Hack to prevent extra spacing over empty state
+.mantine-datatable-empty-state {
+  padding-top: 0 !important;
+}

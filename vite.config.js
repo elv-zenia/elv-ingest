@@ -30,7 +30,8 @@ export default defineConfig({
       "@/components": fileURLToPath(new URL("./src/components", import.meta.url)),
       "@/pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
       "@/stores": fileURLToPath(new URL("./src/stores", import.meta.url)),
-      "@/helpers": fileURLToPath(new URL("./src/helpers", import.meta.url))
+      "@/helpers": fileURLToPath(new URL("./src/helpers", import.meta.url)),
+      "@/data": fileURLToPath(new URL("./src/data", import.meta.url))
     }
   }
 });

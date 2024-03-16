@@ -1,12 +1,27 @@
 import {Text, Button as MantineButton} from "@mantine/core";
 import classes from "@/assets/stylesheets/Button.module.css";
+import {forwardRef} from "react";
 
-const Button = ({variant, label}) => {
+const Button = forwardRef(function Button({
+    variant,
+    label,
+    uppercase=false,
+    leftSection,
+    rightSection,
+    ...rest
+  }, ref) {
   return (
-    <MantineButton variant={variant} classNames={{root: classes.root}}>
-      <Text tt="uppercase" size="xs" fw="600">{label}</Text>
+    <MantineButton
+      variant={variant}
+      classNames={{root: classes.root}}
+      ref={ref}
+      leftSection={leftSection}
+      rightSection={rightSection}
+      {...rest}
+    >
+      <Text tt={uppercase ? "uppercase" : "unset"} size="xs" fw="600">{label}</Text>
     </MantineButton>
   );
-};
+});
 
 export default Button;

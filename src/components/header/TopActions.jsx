@@ -5,10 +5,12 @@ const TopActions = ({actions=[]}) => {
   return (
     <Flex direction="row" gap="sm">
       {
-        actions.map(({label, variant = "filled"}) => (
+        actions.map(({label, variant = "filled", uppercase}) => (
           <Button
             variant={variant}
-            key={`top-action-${label}`} label={label}
+            key={`top-action-${label}`}
+            label={label}
+            uppercase={uppercase}
           />
         ))
       }

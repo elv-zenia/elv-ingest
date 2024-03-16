@@ -27,7 +27,6 @@ const theme = createTheme({
       "#cdcdcd",
       "#b2b2b2",
       "#9a9a9a",
-      "#A9A0B2",
       "#8b8b8b",
       "#848484",
       "#717171",
@@ -39,13 +38,22 @@ const theme = createTheme({
       "#e8e4ed",
       "#cdc8d3",
       "#b2aaba", // eluvio color
-      "#9a90a4",
+      "#a9a0b2", // eluvio color
       "#8b7f97",
       "#847791",
       "#71667e",
       "#665972",
       "#594c66"
     ]
+  },
+  components: {
+    Menu: {
+      styles: () => ({
+        item: {
+          "--menu-item-hover": "#8b7f97",
+        }
+      })
+    }
   }
 });
 
