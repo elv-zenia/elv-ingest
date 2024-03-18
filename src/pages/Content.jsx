@@ -4,8 +4,8 @@ import {DataTable} from "mantine-datatable";
 import {useEffect} from "react";
 import {dataStore} from "@/stores/index.js";
 import {CONTENT_COLUMNS} from "@/data/ContentData.js";
-import {Text} from "@mantine/core";
-import CreateSection from "@/components/content/CreateSection.jsx";
+import {Flex, Text} from "@mantine/core";
+import CreateDropdown from "@/components/content/CreateDropdown.jsx";
 
 const Content = observer(() => {
   useEffect(() => {
@@ -23,9 +23,12 @@ const Content = observer(() => {
       <PageHeader
         showSearchBar
         showJobsButton
-        title="Ingest Jobs"
+        title="IngestPanel Jobs"
       />
-      <CreateSection />
+      <Flex direction="row" gap="xs" align="center" mt="17px">
+        <CreateDropdown />
+        <Text size="xs">Below are your currently ingested raw assets. Sort and edit here or select individual items. Click the New Media Item button to ingest new items.</Text>
+      </Flex>
       <DataTable
         records={records}
         columns={CONTENT_COLUMNS.map(column => (

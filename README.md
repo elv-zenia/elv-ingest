@@ -1,4 +1,4 @@
-# Eluvio Ingest
+# Eluvio IngestPanel
 
 A web application for ingesting content onto the Eluvio fabric. This app runs with the Content Fabric Eluvio Core JS framework.
 
@@ -14,7 +14,7 @@ Example elv-core-js configuration.js file.
 ```
 const EluvioConfiguration = {
   "apps": {
-    "Eluvio Ingest": "http://localhost:9001"
+    "Eluvio IngestPanel": "http://localhost:9001"
   }
 };
 ```

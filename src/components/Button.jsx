@@ -8,6 +8,7 @@ const Button = forwardRef(function Button({
     uppercase=false,
     leftSection,
     rightSection,
+    onClick,
     ...rest
   }, ref) {
   return (
@@ -17,6 +18,7 @@ const Button = forwardRef(function Button({
       ref={ref}
       leftSection={leftSection}
       rightSection={rightSection}
+      onClick={onClick}
       {...rest}
     >
       <Text tt={uppercase ? "uppercase" : "unset"} size="xs" fw="600">{label}</Text>

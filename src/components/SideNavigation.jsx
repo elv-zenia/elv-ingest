@@ -1,19 +1,16 @@
 import {NavLink} from "react-router-dom";
 import {AppShell, Flex, Text} from "@mantine/core";
-
-const LINKS = [
-  {title: "Content", icon: null, path: "/"}
-];
+import {ROUTES} from "@/data/RouteData.js";
 
 const SideNavigation = () => {
   return (
     <AppShell.Navbar p="md">
       {
-        LINKS.map(({path, title, icon}) => (
+        ROUTES.filter(route => route.showNavbarLink).map(({path, label, icon}) => (
           <NavLink to={path} key={path} className="side-navigation__link">
             <Flex align="center" gap="xs">
               {icon ? icon : null}
-              <Text>{title}</Text>
+              <Text>{label}</Text>
             </Flex>
           </NavLink>
         ))

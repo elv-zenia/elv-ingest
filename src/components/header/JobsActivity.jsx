@@ -1,5 +1,5 @@
 import {Button} from "@mantine/core";
-import Stopwatch from "@/assets/icons/Stopwatch.jsx";
+import StopwatchIcon from "@/assets/icons/StopwatchIcon.jsx";
 import classes from "@/assets/stylesheets/JobsActivity.module.css";
 
 const JobsActivity = () => {
@@ -8,7 +8,7 @@ const JobsActivity = () => {
       variant="subtle"
       color="elv-gray.8"
       fw={400}
-      leftSection={<Stopwatch className={classes.icon} />}
+      leftSection={<StopwatchIcon className={classes.icon} />}
       // TODO: Get dynamic value of job count
       rightSection="(8)"
       classNames={{section: classes.section, label: classes.label}}

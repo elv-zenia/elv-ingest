@@ -1,21 +1,17 @@
-import Content from "@/pages/Content.jsx";
 import {Route, Routes} from "react-router-dom";
 import {observer} from "mobx-react-lite";
+import {ROUTES} from "@/data/RouteData.js";
 
 const AppRoutes = observer(() => {
-  const routes = [
-    {path: "/", Component: <Content />, label: "Home"}
-  ];
-
   return (
     <Routes>
       {
-        routes.map(({path, Component}) => (
+        ROUTES.map(({path, Component}) => (
           <Route
             exact={true}
             key={path}
             path={path}
-            element={Component}
+            element={<Component />}
           />
         ))
       }

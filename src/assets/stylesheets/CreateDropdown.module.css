@@ -11,3 +11,11 @@
     color: var(--mantine-color-white);
   }
 }
+
+.navLink {
+  padding: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}

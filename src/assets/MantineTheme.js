@@ -19,7 +19,8 @@ const theme = createTheme({
       "#9009ff",
       "#7c00e4",
       "#8f5aff", // eluvio color
-      "#5f00b3"
+      "#5f00b3",
+      "#380C61", // eluvio color
     ],
     "elv-gray": [
       "#f5f5f5",
@@ -46,11 +47,29 @@ const theme = createTheme({
       "#594c66"
     ]
   },
+  // Default styles for components that need styles across components
   components: {
-    Menu: {
+    Tabs: {
       styles: () => ({
-        item: {
-          "--menu-item-hover": "#8b7f97",
+        list: {
+          "--tab-border-color": "var(--mantine-color-elv-neutral-4)",
+          "--tabs-list-border-size": "1px"
+        }
+      })
+    },
+    Anchor: {
+      styles: () => ({
+        root: {
+          "textDecoration": "underline",
+          "fontWeight": "700",
+          "fontSize": "0.75rem"
+        }
+      })
+    },
+    Radio: {
+      styles: () => ({
+        root: {
+          "--radio-icon-size": "0.5rem"
         }
       })
     }
