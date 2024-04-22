@@ -10,7 +10,7 @@ import CreateDropdown from "@/components/content/CreateDropdown.jsx";
 const Content = observer(() => {
   useEffect(() => {
     const Initialize = async () => {
-      dataStore.LoadJobs();
+      await dataStore.LoadJobs();
     };
 
     Initialize();

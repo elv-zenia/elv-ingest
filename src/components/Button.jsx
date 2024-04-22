@@ -4,11 +4,11 @@ import {forwardRef} from "react";
 
 const Button = forwardRef(function Button({
     variant,
-    label,
     uppercase=false,
     leftSection,
     rightSection,
     onClick,
+    children,
     ...rest
   }, ref) {
   return (
@@ -21,7 +21,9 @@ const Button = forwardRef(function Button({
       onClick={onClick}
       {...rest}
     >
-      <Text tt={uppercase ? "uppercase" : "unset"} size="xs" fw="600">{label}</Text>
+      <Text tt={uppercase ? "uppercase" : "unset"} size="xs" fw="600">
+        { children }
+      </Text>
     </MantineButton>
   );
 });

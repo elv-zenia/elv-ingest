@@ -9,10 +9,11 @@ const TopActions = ({actions=[]}) => {
           <Button
             variant={variant}
             key={`top-action-${label}`}
-            label={label}
             uppercase={uppercase}
             onClick={onClick}
-          />
+          >
+            { label }
+          </Button>
         ))
       }
     </Flex>

@@ -1,6 +1,7 @@
 import {configure, makeAutoObservable} from "mobx";
 import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
 import DataStore from "@/stores/DataStore.js";
+import UiStore from "@/stores/UiStore.js";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -16,6 +17,7 @@ class RootStore {
 
     this.Initialize();
     this.dataStore = new DataStore(this);
+    this.uiStore = new UiStore(this);
   }
 
   Initialize = () => {
@@ -45,5 +47,6 @@ class RootStore {
 
 export const rootStore = new RootStore();
 export const dataStore = rootStore.dataStore;
+export const uiStore = rootStore.uiStore;
 
 window.rootStore = rootStore;

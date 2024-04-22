@@ -8,7 +8,6 @@ const AppRoutes = observer(() => {
       {
         ROUTES.map(({path, Component}) => (
           <Route
-            exact={true}
             key={path}
             path={path}
             element={<Component />}

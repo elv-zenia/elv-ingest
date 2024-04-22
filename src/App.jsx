@@ -2,11 +2,13 @@ import {observer} from "mobx-react-lite";
 import {BrowserRouter} from "react-router-dom";
 import {AppShell, MantineProvider} from "@mantine/core";
 import "@mantine/core/styles.css";
-import MantineTheme from "@/assets/MantineTheme.js";
-import "@/assets/stylesheets/reset.scss";
 import AppRoutes from "./Routes.jsx";
 import {rootStore} from "@/stores";
+import MantineTheme from "@/assets/MantineTheme.js";
+import "@/assets/stylesheets/reset.scss";
 import SideNavigation from "@/components/SideNavigation.jsx";
+import DataWrapper from "@/components/DataWrapper.jsx";
+import ErrorBoundary from "@/components/error/ErrorBoundary.jsx";
 
 const App = observer(() => {
   return (
@@ -17,7 +19,15 @@ const App = observer(() => {
           <SideNavigation />
           <AppShell.Main>
             {
-              rootStore.loaded ? <AppRoutes /> : null
+              rootStore.loaded ?
+                (
+                  <DataWrapper>
+                    <ErrorBoundary>
+                      <AppRoutes />
+                    </ErrorBoundary>
+                  </DataWrapper>
+                ) :
+                null
             }
           </AppShell.Main>
         </AppShell>

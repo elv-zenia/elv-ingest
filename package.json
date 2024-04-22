@@ -21,6 +21,7 @@
     "@eluvio/elv-client-js": "^4.0.80",
     "@mantine/core": "^7.6.1",
     "@mantine/hooks": "^7.6.1",
+    "@tabler/icons-react": "^3.2.0",
     "mantine-datatable": "^7.6.1",
     "mobx": "^6.12.0",
     "mobx-react-lite": "^4.0.6",

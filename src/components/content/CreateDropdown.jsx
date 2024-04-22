@@ -15,7 +15,7 @@ const CreateDropdown = () => {
   return (
     <Menu position="bottom-start" classNames={{dropdown: classes.dropdown}}>
       <Menu.Target>
-        <Button label="New Media Item" leftSection={<CubePlusIcon />} />
+        <Button leftSection={<CubePlusIcon />}>New Media Item</Button>
       </Menu.Target>
       <Menu.Dropdown>
         {
