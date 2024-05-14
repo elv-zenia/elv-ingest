@@ -1,0 +1,29 @@
+{
+  "comment": "Keep synchronized with vite config",
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@eluvio/elv-client-js/src/FrameClient": ["./node_modules/@eluvio/elv-client-js/src/FrameClient"],
+      "*": ["types/*.d.ts"]
+    },
+    "experimentalDecorators": true
+  },
+  "include": ["src", "**/*.d.ts"],
+  "exclude": ["node_modules"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
