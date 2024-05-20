@@ -1,4 +1,4 @@
-import {makeAutoObservable} from "mobx";
+import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
 
 interface ContentProps {
@@ -14,7 +14,7 @@ interface SiteObjectProps {
 
 // Stores main app constants
 class DataStore {
-  rootStore: RootStore;
+  rootStore!: RootStore;
   tenantId = "";
   siteId = "";
   contentTypes: ContentProps | Record<string,never> = {};
@@ -23,7 +23,10 @@ class DataStore {
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this);
-    this.rootStore = rootStore;
+
+    runInAction(() => {
+      this.rootStore = rootStore;
+    });
   }
 
   get client() {

@@ -1,18 +1,43 @@
-import {NavLink} from "react-router-dom";
-import {AppShell, Flex, Text} from "@mantine/core";
-import {ROUTES} from "@/utils/constants";
+import {AppShell, NavLink, Text} from "@mantine/core";
+import CubeIcon from "@/assets/icons/CubeIcon";
+import StreamIcon from "@/assets/icons/StreamIcon";
+import MonitorIcon from "@/assets/icons/MonitorIcon";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const SideNavigation = () => {
+  const NAV_SECTIONS = [
+    {
+      sectionTitle: "Content Management",
+      links: [
+        {path: "/content", label: "Content", icon: <CubeIcon />},
+        {path: "/streams", label: "Streams", icon: <StreamIcon />},
+        {path: "/monitor", label: "Monitor", icon: <MonitorIcon />}
+      ]
+    }
+  ];
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
-    <AppShell.Navbar p="md">
+    <AppShell.Navbar p="sm">
       {
-        ROUTES.filter(route => route.showNavbarLink).map(({path, label, icon}) => (
-          <NavLink to={path} key={path} className="side-navigation__link">
-            <Flex align="center" gap="xs">
-              {icon ? icon : null}
-              <Text>{label}</Text>
-            </Flex>
-          </NavLink>
+        NAV_SECTIONS.map(({sectionTitle, links}) => (
+          <AppShell.Section key={`navigation-section-${sectionTitle}`}>
+            <Text size="sm" c="elv-gray.9" fw={600} mb="9">
+              { sectionTitle }
+            </Text>
+            {
+              links.map(({path, label, icon}) => (
+                <NavLink
+                  onClick={() => navigate(path)}
+                  key={`navigation-link-${path}`}
+                  label={label}
+                  leftSection={icon}
+                  active={path === location.pathname}
+                />
+              ))
+            }
+          </AppShell.Section>
         ))
       }
     </AppShell.Navbar>

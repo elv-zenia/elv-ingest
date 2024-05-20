@@ -14,6 +14,7 @@ const Button = forwardRef(function Button({
     rightSection,
     onClick,
     children,
+    size="sm",
     ...rest
   }: ButtonProps, ref: React.ForwardedRef<HTMLButtonElement>) {
   return (
@@ -21,6 +22,7 @@ const Button = forwardRef(function Button({
       variant={variant}
       classNames={{root: classes.root}}
       ref={ref}
+      size={size}
       leftSection={leftSection}
       rightSection={rightSection}
       onClick={onClick}

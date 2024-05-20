@@ -10,10 +10,11 @@ const IngestPanel = () => {
     <>
       <Title size="1.25rem" fw={600} className={classes.title} mb="16px">Upload New Media</Title>
       <Text size="xs" mb="8px">
-        {/* TODO: Add links here */}
+        {/* TODO: Add link */}
         Current ingest settings will apply to all videos. <Anchor href="/">View/Edit Defaults</Anchor>
       </Text>
       <Text size="xs" mb="16px">
+        {/* TODO: Add link */}
         If your video/audio are in separate files, <Anchor href="/">click here</Anchor>.
       </Text>
       <Radio.Group

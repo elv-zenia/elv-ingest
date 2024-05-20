@@ -32,7 +32,7 @@ const ContentItemNew = () => {
         <Tabs.List className={classes.list}>
           {
             CREATE_TABS.map(tab => (
-              <Tabs.Tab value={tab.value} key={`create-tabs-${tab.value}`} className={classes.tab} color="elv-violet.10">
+              <Tabs.Tab value={tab.value} key={`create-tabs-${tab.value}`} className={classes.tab} color="elv-violet.11">
                 <Text fw="700" size="sm">{tab.label}</Text>
               </Tabs.Tab>
             ))

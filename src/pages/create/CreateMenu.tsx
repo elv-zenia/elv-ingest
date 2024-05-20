@@ -1,6 +1,6 @@
 import {Menu, NavLink} from "@mantine/core";
 import Button from "@/components/common/Button";
-import classes from "@/assets/stylesheets/CreateDropdown.module.css";
+import classes from "@/assets/stylesheets/CreateMenu.module.css";
 import CubePlusIcon from "@/assets/icons/CubePlusIcon";
 import {Link} from "react-router-dom";
 

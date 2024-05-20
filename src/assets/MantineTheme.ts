@@ -1,4 +1,4 @@
-import {createTheme} from "@mantine/core";
+import {createTheme, MantineTheme, NavLinkProps} from "@mantine/core";
 
 const theme = createTheme({
   fontFamily: "Inter, Montserrat, Helvetica Neue, Helvetica, sans-serif",
@@ -13,6 +13,7 @@ const theme = createTheme({
       "#f9e9ff",
       "#ebcfff",
       "#d29cff",
+      "#bd6dff", // eluvio color
       "#b964ff", // eluvio color
       "#a437fe",
       "#971afe",
@@ -70,6 +71,24 @@ const theme = createTheme({
       styles: () => ({
         root: {
           "--radio-icon-size": "0.5rem"
+        }
+      })
+    },
+    NavLink: {
+      styles: (_theme: MantineTheme, props: NavLinkProps) => ({
+        root: {
+          "--nl-bg": "var(--mantine-color-elv-gray-0)",
+          "borderRadius": "4px"
+        },
+        body: {
+          "lineHeight": 1
+        },
+        label: {
+          "fontWeight": 600,
+          "color": props.active ? "var(--mantine-color-elv-violet-3)" : "var(--mantine-color-elv-gray-9)"
+        },
+        section: {
+          color: "var(--mantine-color-elv-neutral-4)"
         }
       })
     }

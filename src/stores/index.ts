@@ -1,4 +1,4 @@
-import {configure, makeAutoObservable} from "mobx";
+import {configure, makeAutoObservable, runInAction} from "mobx";
 import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
 import DataStore from "@/stores/DataStore";
 import UiStore from "@/stores/UiStore";
@@ -12,15 +12,18 @@ export class RootStore {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: any;
   loaded = false;
-  dataStore: DataStore;
-  uiStore: UiStore;
+  dataStore!: DataStore;
+  uiStore!: UiStore;
 
   constructor() {
     makeAutoObservable(this);
 
     this.Initialize();
-    this.dataStore = new DataStore(this);
-    this.uiStore = new UiStore(this);
+
+    runInAction(() => {
+      this.dataStore = new DataStore(this);
+      this.uiStore = new UiStore(this);
+    });
   }
 
   Initialize = () => {

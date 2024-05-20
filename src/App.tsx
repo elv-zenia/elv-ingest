@@ -15,7 +15,7 @@ const App = observer(() => {
     // TODO: Support color scheme switching
     <MantineProvider withCssVariables defaultColorScheme="light" theme={MantineTheme}>
       <BrowserRouter>
-        <AppShell padding="lg" navbar={{width: 230, breakpoint: "sm"}}>
+        <AppShell padding="lg" navbar={{width: 210, breakpoint: "sm"}}>
           <SideNavigation />
           <AppShell.Main>
             {

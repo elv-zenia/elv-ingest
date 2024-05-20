@@ -9,7 +9,7 @@
 
 .input {
   &:focus {
-    border: 1px solid var(--mantine-color-elv-violet-3);
+    border: 1px solid var(--mantine-color-elv-violet-4);
   }
 
   border-radius: 100px;
