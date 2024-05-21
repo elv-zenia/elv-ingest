@@ -80,7 +80,150 @@ class DataStore {
     this.siteId = response?.sites?.live_streams;
   }
 
-  LoadJobs() {
+  *LoadAllStreamData(): unknown {
+    let streamMetadata: StreamMapProps;
+    try {
+      const siteMetadata = yield this.client.ContentObjectMetadata({
+        libraryId: yield this.client.ContentObjectLibraryId({objectId: this.siteId}),
+        objectId: this.siteId,
+        select: [
+          "public/asset_metadata/live_streams"
+        ],
+        resolveLinks: true,
+        resolveIgnoreErrors: true,
+        resolveIncludeSource: true
+      });
+
+      streamMetadata = siteMetadata?.public?.asset_metadata?.live_streams;
+    } catch(error) {
+      throw Error(`Unable to load live streams for site ${this.siteId}.`);
+    }
+
+    yield this.client.utils.LimitedMap(
+      10,
+      Object.keys(streamMetadata),
+      async (slug: string) => {
+        const stream = streamMetadata[slug];
+
+        const versionHash = stream?.["."]?.source;
+
+        if(versionHash) {
+          const objectId = this.client.utils.DecodeVersionHash(versionHash).objectId;
+          const libraryId = await this.client.ContentObjectLibraryId({objectId});
+
+          const streamDetails = await this.LoadStreamMetadata({
+            objectId,
+            libraryId
+          }) || {};
+
+          streamMetadata[slug] = {
+            ...streamMetadata[slug],
+            ...streamDetails
+          };
+
+          streamMetadata[slug].slug = slug;
+          streamMetadata[slug].objectId = objectId;
+          streamMetadata[slug].versionHash = versionHash;
+          streamMetadata[slug].libraryId = libraryId;
+          streamMetadata[slug].title = stream.display_title || stream.title;
+          streamMetadata[slug].embedUrl = await this.client.EmbedUrl({objectId, mediaType: "live_video"});
+        } else {
+          console.error(`No version hash for ${slug}`);
+        }
+      }
+    );
+  }
+
+
+  *LoadStreamMetadata({objectId, libraryId}: {objectId: string, libraryId: string}): Generator<StreamProps> | Promise<StreamProps> {
+    try {
+      if(!libraryId) {
+        libraryId = (yield this.client.ContentObjectLibraryId({objectId})) as string;
+      }
+
+      type ProbeMetaProps = {
+        format: {
+          filename: string;
+        },
+        streams: {
+          codec_type: "video" | "audio";
+          bit_rate: number;
+          codec_name: string;
+        }[]
+      };
+
+      type StreamMetadataProps = {
+        live_recording: {
+          recording_config: {
+            recording_params: {
+              origin_url: string;
+              simple_watermark: string;
+              image_watermark: string;
+            }
+          }
+        },
+        live_recording_config: {
+          probe_info: ProbeMetaProps,
+          reference_url: string;
+          url: string;
+          drm_type: string;
+        }
+      }
+
+      const streamMeta = (yield this.client.ContentObjectMetadata({
+        objectId,
+        libraryId,
+        select: [
+          "live_recording_config/probe_info/format/filename",
+          "live_recording_config/probe_info/streams",
+          "live_recording/recording_config/recording_params/origin_url",
+          "live_recording/recording_config/recording_params/simple_watermark",
+          "live_recording/recording_config/recording_params/image_watermark",
+          "live_recording_config/reference_url",
+          "live_recording_config/url",
+          "live_recording_config/drm_type"
+        ]
+      })) as StreamMetadataProps;
+      let probeMeta = streamMeta?.live_recording_config?.probe_info;
+
+      // Phase out as new streams will have live_recording_config/probe_info
+      if(!probeMeta) {
+        probeMeta = (yield this.client.ContentObjectMetadata({
+          objectId,
+          libraryId,
+          metadataSubtree: "/live_recording/probe_info",
+          select: [
+            "format/filename",
+            "streams"
+          ]
+        })) as ProbeMetaProps;
+      }
+
+      let probeType = (probeMeta?.format?.filename)?.split("://")[0];
+      if(probeType === "srt" && !probeMeta.format?.filename?.includes("listener")) {
+        probeType = "srt-caller";
+      }
+
+      const videoStream = (probeMeta?.streams || []).find(stream => stream.codec_type === "video");
+      const audioStreamCount = probeMeta?.streams ? (probeMeta?.streams || []).filter(stream => stream.codec_type === "audio").length : undefined;
+
+      return {
+        originUrl: streamMeta?.live_recording?.recording_config?.recording_params?.origin_url || streamMeta?.live_recording_config?.url,
+        format: probeType,
+        videoBitrate: videoStream?.bit_rate,
+        codecName: videoStream?.codec_name,
+        audioStreamCount,
+        referenceUrl: streamMeta?.live_recording_config?.reference_url,
+        drm: streamMeta?.live_recording_config?.drm_type,
+        simpleWatermark: streamMeta?.live_recording?.recording_config?.recording_params?.simple_watermark,
+        imageWatermark: streamMeta?.live_recording?.recording_config?.recording_params?.image_watermark
+      };
+    } catch(error) {
+      console.error("Unable to load stream metadata", error);
+    }
+  }
+
+  LoadJobs(): void {
     const localStorageJobs = localStorage.getItem("elv-jobs");
     if(localStorageJobs) {
       const parsedJobs = JSON.parse(

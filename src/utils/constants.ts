@@ -4,6 +4,7 @@ import PreviewPanel from "@/pages/create/PreviewPanel";
 import ProgressPanel from "@/pages/create/ProgressPanel";
 import Content from "@/pages/content/Content";
 import ContentItemNew from "@/pages/content/ContentItemNew";
+import Streams from "@/pages/streams/Streams";
 
 export const CONTENT_COLUMNS = [
   {title: "Name"},
@@ -27,6 +28,7 @@ export const UPLOAD_TYPES = [
 ];
 
 export const ROUTES = [
+  // Ingest routes
   {
     path: "/content",
     Component: Content,
@@ -36,5 +38,11 @@ export const ROUTES = [
     path: "/content/new",
     Component: ContentItemNew,
     label: "New"
+  },
+  // Live Stream routes
+  {
+    path: "/streams",
+    Component: Streams,
+    label: "Streams"
   }
 ];

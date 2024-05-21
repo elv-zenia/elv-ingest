@@ -9,7 +9,9 @@ interface DataWrapperProps {
 const DataWrapper = observer(({children}: DataWrapperProps) => {
   useEffect(() => {
     const Load = async() => {
-      dataStore.LoadTenantData();
+      await dataStore.LoadTenantData();
+      await dataStore.LoadSiteData();
+      await dataStore.LoadAllStreamData();
     };
 
     Load();
