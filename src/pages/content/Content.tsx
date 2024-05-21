@@ -10,7 +10,7 @@ import CreateDropdown from "@/pages/create/CreateMenu";
 const Content = observer(() => {
   useEffect(() => {
     const Initialize = async () => {
-      await dataStore.LoadJobs();
+      await dataStore.LoadIngestJobs();
     };
 
     Initialize();
@@ -23,7 +23,7 @@ const Content = observer(() => {
       <PageHeader
         showSearchBar
         showJobsButton
-        title="IngestPanel Jobs"
+        title="Ingested Content"
       />
       <Flex direction="row" gap="xs" align="center" mt="17px">
         <CreateDropdown />

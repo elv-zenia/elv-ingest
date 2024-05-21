@@ -1,7 +1,10 @@
 import {observer} from "mobx-react-lite";
 import {BrowserRouter} from "react-router-dom";
+
 import {AppShell, MantineProvider} from "@mantine/core";
 import "@mantine/core/styles.css";
+import "mantine-datatable/styles.css";
+
 import AppRoutes from "./Routes";
 import {rootStore} from "@/stores";
 import MantineTheme from "@/assets/MantineTheme";

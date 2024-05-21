@@ -1,5 +1,6 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
+import {IngestJobProps, StreamMap, StreamProps} from "components/components";
 
 interface ContentProps {
   title: string;
@@ -19,7 +20,8 @@ class DataStore {
   siteId = "";
   contentTypes: ContentProps | Record<string,never> = {};
   siteObjects: SiteObjectProps | Record<string,never> = {};
-  jobs: JobsProps | null = {};
+  jobs: IngestJobProps | null = {};
+  streams: StreamMap = {};
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this);
@@ -67,6 +69,8 @@ class DataStore {
   }
 
   *LoadSiteData(): unknown {
+    if(!this.tenantId) { yield this.LoadTenantData(); }
+
     const response = yield this.client.ContentObjectMetadata({
       libraryId: this.tenantId.replace("iten", "ilib"),
       objectId: this.tenantId.replace("iten", "iq__"),
@@ -77,12 +81,15 @@ class DataStore {
         "content_types/title"
       ]
     });
+
     this.siteId = response?.sites?.live_streams;
   }
 
   *LoadAllStreamData(): unknown {
-    let streamMetadata: StreamMapProps;
+    let streamMetadata: StreamMap;
     try {
+      if(!this.siteId) { yield this.LoadSiteData(); }
+
       const siteMetadata = yield this.client.ContentObjectMetadata({
         libraryId: yield this.client.ContentObjectLibraryId({objectId: this.siteId}),
         objectId: this.siteId,
@@ -132,8 +139,9 @@ class DataStore {
         }
       }
     );
-  }
 
+    this.UpdateStreams({streams: streamMetadata});
+  }
 
   *LoadStreamMetadata({objectId, libraryId}: {objectId: string, libraryId: string}): Generator<StreamProps> | Promise<StreamProps> {
     try {
@@ -223,21 +231,25 @@ class DataStore {
     }
   }
 
-  LoadJobs(): void {
+  LoadIngestJobs(): void {
     const localStorageJobs = localStorage.getItem("elv-jobs");
     if(localStorageJobs) {
       const parsedJobs = JSON.parse(
         this.rootStore.Decode({text: localStorageJobs})
       );
 
-      this.UpdateJobs({jobs: parsedJobs});
+      this.UpdateIngestJobs({jobs: parsedJobs});
     } else {
-      this.UpdateJobs({jobs: {}});
+      this.UpdateIngestJobs({jobs: {}});
     }
   }
 
-  UpdateJobs({jobs}: {jobs: JobsProps | null}) {
+  UpdateIngestJobs({jobs}: {jobs: IngestJobProps | null}) {
     this.jobs = jobs;
+  }
+
+  UpdateStreams({streams}: {streams: StreamMap}) {
+    this.streams = streams;
   }
 }
 

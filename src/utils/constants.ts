@@ -5,6 +5,7 @@ import ProgressPanel from "@/pages/create/ProgressPanel";
 import Content from "@/pages/content/Content";
 import ContentItemNew from "@/pages/content/ContentItemNew";
 import Streams from "@/pages/streams/Streams";
+import {Codec, Format, Quality, Status} from "components/components";
 
 export const CONTENT_COLUMNS = [
   {title: "Name"},
@@ -46,3 +47,62 @@ export const ROUTES = [
     label: "Streams"
   }
 ];
+
+// Maps of variables
+
+export const STATUS_MAP = {
+  UNCONFIGURED: "unconfigured",
+  UNINITIALIZED: "uninitialized",
+  INITIALIZED: "initialized",
+  INACTIVE: "inactive",
+  STOPPED: "stopped",
+  STARTING: "starting",
+  RUNNING: "running",
+  STALLED: "stalled",
+  DEGRADED: "degraded"
+};
+
+export const QUALITY_MAP = {
+  DEGRADED: "degraded",
+  SEVERE: "severe",
+  GOOD: "good"
+};
+
+// Maps of human-readable text
+
+export const FORMAT_TEXT: Record<Format, string> = {
+  udp: "MPEGTS",
+  srt: "SRT",
+  "srt-caller": "SRT Caller",
+  rtmp: "RTMP"
+};
+
+export const CODEC_TEXT: Record<Codec, string> = {
+  h264: "H.264",
+  h265: "H.265",
+  mpeg2video: "MPEG-2"
+};
+
+export const RECORDING_STATUS_TEXT = {
+  NOT_AVAILABLE: "Not Available",
+  PARTIALLY_AVAILABLE: "Partially Available",
+  AVAILABLE: "Available"
+};
+
+export const QUALITY_TEXT: Record<Quality, string> = {
+  "good": "Good",
+  "severe": "Severe",
+  "degraded": "Degraded"
+};
+
+export const STATUS_TEXT: Record<Status, string> = {
+  unconfigured: "Not Configured",
+  uninitialized: "Uninitialized",
+  initialized: "Initialized",
+  inactive: "Inactive",
+  stopped: "Stopped",
+  starting: "Starting",
+  running: "Running",
+  stalled: "Stalled",
+  terminating: "Terminating"
+};

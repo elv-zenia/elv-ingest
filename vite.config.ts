@@ -31,7 +31,8 @@ export default defineConfig({
       "@/pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
       "@/stores": fileURLToPath(new URL("./src/stores", import.meta.url)),
       "@/helpers": fileURLToPath(new URL("./src/helpers", import.meta.url)),
-      "@/utils": fileURLToPath(new URL("./src/utils", import.meta.url))
+      "@/utils": fileURLToPath(new URL("./src/utils", import.meta.url)),
+      "@/types": fileURLToPath(new URL("./types", import.meta.url))
     }
   }
 });
