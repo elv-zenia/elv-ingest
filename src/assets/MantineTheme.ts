@@ -1,6 +1,7 @@
 import {createTheme, MantineTheme, NavLinkProps} from "@mantine/core";
+import {PartialObjectDeep} from "type-fest/source/partial-deep";
 
-const theme = createTheme({
+const theme: PartialObjectDeep<MantineTheme, object> = createTheme({
   fontFamily: "Inter, Montserrat, Helvetica Neue, Helvetica, sans-serif",
   fontFamilyMonospace: "Monaco, Courier, monospace",
   headings: {
@@ -8,6 +9,7 @@ const theme = createTheme({
   },
   primaryColor: "elv-violet",
   primaryShade: 3,
+  cursorType: "pointer",
   colors: {
     "elv-violet": [
       "#f9e9ff",
@@ -46,6 +48,54 @@ const theme = createTheme({
       "#71667e",
       "#665972",
       "#594c66"
+    ],
+    "elv-orange": [
+      "#fff6e1",
+      "#ffeccc",
+      "#ffd79b",
+      "#ffc164",
+      "#ffae38",
+      "#ffa31b",
+      "#f90", // eluvio color
+      "#e38800",
+      "#ca7800",
+      "#b06700"
+    ],
+    "elv-red": [
+      "#ffe9e6",
+      "#ffd3cd",
+      "#ffa69b",
+      "#ff7663",
+      "#ff4723", // eluvio color
+      "#ff3418",
+      "#ff2507",
+      "#e41600",
+      "#cc0e00",
+      "#b20000"
+    ],
+    "elv-yellow": [
+      "#fffde2",
+      "#fffacc",
+      "#fff59b",
+      "#ffef64",
+      "#ffeb39",
+      "#ffe81d",
+      "#ffe607", // eluvio color
+      "#e3cc00",
+      "#c9b500",
+      "#ad9c00"
+    ],
+    "elv-green": [
+      "#e4fdf4",
+      "#d6f6e8",
+      "#b0e8d1",
+      "#88dab8",
+      "#66cfa3",
+      "#57ca9a", // eluvio color
+      "#41c48f",
+      "#30ad7a",
+      "#249a6b",
+      "#0b865a"
     ]
   },
   // Default styles for components that need styles across components
@@ -81,7 +131,7 @@ const theme = createTheme({
           "borderRadius": "4px"
         },
         body: {
-          "lineHeight": 1
+          "lineHeight": 1.2
         },
         label: {
           "fontWeight": 600,

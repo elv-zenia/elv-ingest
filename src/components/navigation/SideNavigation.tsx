@@ -29,6 +29,7 @@ const SideNavigation = () => {
             {
               links.map(({path, label, icon}) => (
                 <NavLink
+                  href="#"
                   onClick={() => navigate(path)}
                   key={`navigation-link-${path}`}
                   label={label}

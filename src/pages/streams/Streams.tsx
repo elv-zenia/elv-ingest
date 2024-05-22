@@ -43,6 +43,7 @@ const Streams = observer(() => {
     const Load = async() => {
       try {
         await dataStore.LoadAllStreamData();
+        await dataStore.LoadAllStreamStatus();
       } finally {
         setLoading(false);
       }

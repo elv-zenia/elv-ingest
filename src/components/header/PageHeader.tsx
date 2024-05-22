@@ -18,7 +18,7 @@ const PageHeader = observer(({
   actions=[]
 }: PageHeaderProps) => {
   return (
-    <Flex direction="column">
+    <Flex direction="column" mb="15px">
       <Flex direction="row" align="center" justify="space-between">
         {showSearchBar && <SearchBar/>}
         {

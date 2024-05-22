@@ -1,6 +1,6 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
-import {IngestJobProps, StreamMap, StreamProps} from "components/components";
+import {IngestJobProps, StatusProps, StreamMap, StreamProps} from "components/components";
 
 interface ContentProps {
   title: string;
@@ -22,6 +22,7 @@ class DataStore {
   siteObjects: SiteObjectProps | Record<string,never> = {};
   jobs: IngestJobProps | null = {};
   streams: StreamMap = {};
+  loadingStatus = false;
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this);
@@ -118,7 +119,7 @@ class DataStore {
           const objectId = this.client.utils.DecodeVersionHash(versionHash).objectId;
           const libraryId = await this.client.ContentObjectLibraryId({objectId});
 
-          const streamDetails = await this.LoadStreamMetadata({
+          const streamDetails = await this.LoadStreamData({
             objectId,
             libraryId
           }) || {};
@@ -143,7 +144,75 @@ class DataStore {
     this.UpdateStreams({streams: streamMetadata});
   }
 
-  *LoadStreamMetadata({objectId, libraryId}: {objectId: string, libraryId: string}): Generator<StreamProps> | Promise<StreamProps> {
+  *LoadAllStreamStatus(): unknown {
+    if(this.loadingStatus) { return; }
+
+    try {
+      this.loadingStatus = true;
+
+      yield this.client.utils.LimitedMap(
+        15,
+        Object.keys(this.streams || {}),
+        async (slug: string) => {
+          try {
+            const streamMeta = this.streams?.[slug];
+            await this.LoadStreamStatus({
+              objectId: streamMeta.objectId as string,
+              slug,
+              update: true
+            });
+          } catch(error) {
+            console.error(`Skipping status for ${this.streams?.[slug].objectId || slug}.`, error);
+          }
+        }
+      );
+    } catch(error) {
+      console.error(error);
+    } finally {
+      this.loadingStatus = false;
+    }
+  }
+
+  *LoadStreamStatus({
+    objectId,
+    slug,
+    stopLro=false,
+    showParams=false,
+    update=false
+  }: {objectId: string, slug?: string, stopLro?: boolean, showParams?: boolean, update?: boolean}): Generator<StatusProps> | Promise<StatusProps> {
+    try {
+      const response = (yield this.client.StreamStatus({
+        name: objectId,
+        stopLro,
+        showParams
+      })) as StatusProps;
+
+      if(update) {
+        if(!slug) {
+          slug = Object.keys(this.streams || {}).find(slug => (
+            this.streams[slug].objectId === objectId
+          ));
+        }
+
+        this.UpdateStream({
+          key: slug,
+          value: {
+            status: response.state,
+            warnings: response.warnings,
+            quality: response.quality,
+            embedUrl: response?.playout_urls?.embed_url
+          }
+        });
+      }
+
+      return response;
+    } catch(error) {
+      console.error(`Failed to load status for ${objectId || "object"}`, error);
+      return {};
+    }
+  }
+
+  *LoadStreamData({objectId, libraryId}: {objectId: string, libraryId: string}): Generator<StreamProps> | Promise<StreamProps> {
     try {
       if(!libraryId) {
         libraryId = (yield this.client.ContentObjectLibraryId({objectId})) as string;
@@ -250,6 +319,16 @@ class DataStore {
 
   UpdateStreams({streams}: {streams: StreamMap}) {
     this.streams = streams;
+  }
+
+  UpdateStream({key, value={}}: {key?: string, value: object}) {
+    if(!key) { return; }
+
+    this.streams[key] = {
+      ...(this.streams[key] || {}),
+      ...value,
+      slug: key
+    };
   }
 }
 

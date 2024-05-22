@@ -1,19 +1,16 @@
 import {STATUS_MAP, QUALITY_MAP, FORMAT_TEXT, CODEC_TEXT} from "@/utils/constants";
 
 type StreamMap = { [key: string]: StreamProps };
-
 type Status = typeof STATUS_MAP[keyof typeof STATUS_MAP];
-
 type StreamTableSortColumns = "title" | "status";
-
 type Quality = typeof QUALITY_MAP[keyof typeof QUALITY_MAP];
-
 type Format = keyof FORMAT_TEXT;
 type Codec = keyof CODEC_TEXT;
 
 interface IconProps {
   className?: string;
   color?: string;
+  size?: string;
 }
 
 // TODO: Create jobs type
@@ -52,6 +49,40 @@ interface LiveConfigProps {
   reference_url: string;
 }
 
+interface StatusProps {
+  name: string;
+  library_id: string;
+  object_id: string;
+  fabric_api: string;
+  url: string;
+  edge_write_token: string;
+  stream_id: string;
+  edge_meta_size: number;
+  recording_period_sequence: number;
+  tlro: string;
+  recording_period: {
+    start_time_epoch_sec: number;
+    start_time_text: string;
+    end_time_epoch_sec: number;
+    end_time_text: string;
+    video_parts: number;
+    video_last_part_finalized_epoch_sec: number;
+    video_since_last_finalize_sec: number;
+  },
+  lro_status_url: string;
+  insertions: {
+    insertion_time: number;
+    playout: string;
+  }[];
+  playout_urls: {
+    embed_url: string;
+  }
+  warnings: string[];
+  quality: Quality;
+  state: Status;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ElvError extends Error {
   kind: string;
 

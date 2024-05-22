@@ -56,15 +56,15 @@ export const StreamIsActive = (state: Status): boolean => {
   return active;
 };
 
-export const StatusIndicator = (status: Status): "elv-orange.6" | "elv-green.5" | "elv-red.4" | "elv-yellow.6" | "" => {
+export const StatusIndicator = (status: Status): "var(--mantine-color-elv-orange-6)" | "var(--mantine-color-elv-green-5)" | "var(--mantine-color-elv-red-4)" | "var(--mantine-color-elv-yellow-6)" | "" => {
   if(status === STATUS_MAP.STOPPED) {
-    return "elv-orange.6";
+    return "var(--mantine-color-elv-orange-6)";
   } else if(status === STATUS_MAP.RUNNING) {
-    return "elv-green.5";
+    return "var(--mantine-color-elv-green-5)";
   } else if([STATUS_MAP.INACTIVE, STATUS_MAP.UNINITIALIZED, STATUS_MAP.UNINITIALIZED, STATUS_MAP.STALLED].includes(status)) {
-    return "elv-red.4";
+    return "var(--mantine-color-elv-red-4)";
   } else if(status === STATUS_MAP.DEGRADED) {
-    return "elv-yellow.6";
+    return "var(--mantine-color-elv-yellow-6)";
   } else {
     return "";
   }

@@ -25,7 +25,7 @@ const Content = observer(() => {
         showJobsButton
         title="Ingested Content"
       />
-      <Flex direction="row" gap="xs" align="center" mt="17px">
+      <Flex direction="row" gap="xs" align="center">
         <CreateDropdown />
         <Text size="xs">Below are your currently ingested raw assets. Sort and edit here or select individual items. Click the New Media Item button to ingest new items.</Text>
       </Flex>

@@ -11,7 +11,6 @@ const DataWrapper = observer(({children}: DataWrapperProps) => {
     const Load = async() => {
       await dataStore.LoadTenantData();
       await dataStore.LoadSiteData();
-      await dataStore.LoadAllStreamData();
     };
 
     Load();
