@@ -3,6 +3,7 @@ import classes from "@/assets/stylesheets/StatusText.module.css";
 import {Quality, Status} from "components/components";
 import {QUALITY_MAP, STATUS_TEXT} from "@/utils/constants";
 import {StatusIndicator} from "@/utils/helpers";
+import CircleFilled from "@/assets/icons/CircleFilled";
 
 interface StatusTextProps {
   status: Status;
@@ -29,8 +30,9 @@ const StatusText = ({status, quality, withBorder=false}: StatusTextProps) => {
     return (
       <Box className={withBorder ? classes.box : ""}>
         <Group gap={0}>
+          <CircleFilled color="var(--mantine-color-elv-orange-3)" />
           {/*<IconAlertCircle color="var(--mantine-color-elv-orange-3)" width={15} />*/}
-          <Text fz="sm" ml="md">
+          <Text size="sm" ml="md">
             {statusText}
           </Text>
         </Group>

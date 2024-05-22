@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {Link} from "react-router-dom";
 import {DataTable, DataTableSortStatus} from "mantine-datatable";
-import {ActionIcon, Group, Text} from "@mantine/core";
+import {ActionIcon, Group, MantineSize, Stack, Text} from "@mantine/core";
 import {useDebounceCallback, useDebouncedValue} from "@mantine/hooks";
 
 import PageHeader from "@/components/header/PageHeader";
@@ -11,6 +11,27 @@ import {StreamIsActive, SanitizeUrl, VideoBitrateReadable, SortTable} from "@/ut
 import {dataStore} from "@/stores";
 import {StreamProps} from "components/components";
 import StatusText from "@/components/header/StatusText";
+
+interface TableCellTextProps {
+  fw?: number;
+  children: ReactNode;
+  truncate?: boolean;
+  dimmed?: boolean;
+  size?: MantineSize
+}
+
+const TableCellText = ({fw=400, children, truncate=false, dimmed=false, size="sm"}: TableCellTextProps) => {
+  return (
+    <Text
+      size={size}
+      fw={fw}
+      truncate={truncate ? "end" : undefined}
+      c={dimmed ? "elv-gray.7" : "black"}
+    >
+      { children }
+    </Text>
+  );
+};
 
 const Streams = observer(() => {
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<StreamProps>>({columnAccessor: "title", direction: "asc"});
@@ -56,17 +77,17 @@ const Streams = observer(() => {
         onSortStatusChange={setSortStatus}
         columns={[
           { accessor: "title", title: "Name", sortable: true, render: record => (
-              <div className="table__multi-line">
+              <Stack gap={2}>
                 <Link to={`/streams/${record.objectId}`}>
-                  <Text fw={600}>{record.title}</Text>
+                  <TableCellText fw={600}>{record.title}</TableCellText>
                 </Link>
-                <Text c="dimmed" fz="xs">{record.objectId}</Text>
-              </div>
+                <TableCellText dimmed size="xs">{record.objectId}</TableCellText>
+              </Stack>
             )},
-          { accessor: "originUrl", title: "URL", render: record => <Text>{SanitizeUrl({url: record.originUrl})}</Text> },
-          { accessor: "format", title: "Format", render: record => <Text>{record.format ? FORMAT_TEXT[record.format] : ""}</Text> },
-          { accessor: "video", title: "Video", render: record => <Text>{record.codecName ? CODEC_TEXT[record.codecName] : ""} {VideoBitrateReadable(record.videoBitrate)}</Text> },
-          { accessor: "audioStreams", title: "Audio", render: record => <Text>{record.audioStreamCount ? `${record.audioStreamCount} ${record.audioStreamCount > 1 ? "streams" : "stream"}` : ""}</Text> },
+          { accessor: "originUrl", title: "URL", render: record => <TableCellText truncate>{SanitizeUrl({url: record.originUrl})}</TableCellText> },
+          { accessor: "format", title: "Format", render: record => <TableCellText>{record.format ? FORMAT_TEXT[record.format] : ""}</TableCellText> },
+          { accessor: "video", title: "Video", render: record => <TableCellText fw={600}>{record.codecName ? CODEC_TEXT[record.codecName] : ""} {VideoBitrateReadable(record.videoBitrate)}</TableCellText> },
+          { accessor: "audioStreams", title: "Audio", render: record => <TableCellText fw={600}>{record.audioStreamCount ? `${record.audioStreamCount} ${record.audioStreamCount > 1 ? "streams" : "stream"}` : ""}</TableCellText> },
           {
             accessor: "status",
             title: "Status",

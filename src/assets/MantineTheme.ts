@@ -31,7 +31,7 @@ const theme = createTheme({
       "#9a9a9a",
       "#8b8b8b",
       "#848484",
-      "#717171",
+      "#808080", // eluvio color
       "#656565",
       "#3C3C3C" // eluvio color
     ],
