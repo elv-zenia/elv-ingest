@@ -9,18 +9,22 @@ interface PageHeaderProps {
   showSearchBar?: boolean;
   showJobsButton?: boolean;
   actions?: ActionProps[];
+  searchValue?: string;
+  SearchValueCallback?: (arg: string) => void;
 }
 
 const PageHeader = observer(({
   title,
   showSearchBar=false,
   showJobsButton=true,
-  actions=[]
+  actions=[],
+  searchValue,
+  SearchValueCallback,
 }: PageHeaderProps) => {
   return (
     <Flex direction="column" mb="15px">
       <Flex direction="row" align="center" justify="space-between">
-        {showSearchBar && <SearchBar/>}
+        {showSearchBar && <SearchBar value={searchValue!} setValue={SearchValueCallback!} />}
         {
           actions.length > 0 ?
             <TopActions actions={actions} /> : null

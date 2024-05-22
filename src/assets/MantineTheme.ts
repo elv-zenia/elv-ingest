@@ -141,6 +141,13 @@ const theme: PartialObjectDeep<MantineTheme, object> = createTheme({
           color: "var(--mantine-color-elv-neutral-4)"
         }
       })
+    },
+    Table: {
+      styles: () => ({
+        tr: {
+          "--mantine-datatable-highlight-on-hover-color": "var(--mantine-color-elv-neutral-1)"
+        }
+      })
     }
   }
 });

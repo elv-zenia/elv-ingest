@@ -35,8 +35,8 @@ const TableCellText = ({fw=400, children, truncate=false, dimmed=false, size="sm
 
 const Streams = observer(() => {
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<StreamProps>>({columnAccessor: "title", direction: "asc"});
-  const [filter, setFilter] = useState("");
-  const [debouncedFilter] = useDebouncedValue(filter, 200);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 200);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const Streams = observer(() => {
   }, 500);
 
   const records = Object.values(dataStore.streams || {})
-    .filter(record => !debouncedFilter || (record.title || "").toLowerCase().includes(debouncedFilter.toLowerCase()))
+    .filter(record => !debouncedSearch || (record.title || "").toLowerCase().includes(debouncedSearch.toLowerCase()))
     .sort(SortTable({sortStatus}));
 
   return (
@@ -65,6 +65,8 @@ const Streams = observer(() => {
       <PageHeader
         showSearchBar
         showJobsButton
+        searchValue={search}
+        SearchValueCallback={setSearch}
         title="Streams"
       />
       <DataTable

@@ -1,10 +1,11 @@
 import {Flex, TextInput} from "@mantine/core";
-import {useState} from "react";
 import MagnifyingGlassIcon from "@/assets/icons/MagnifyingGlassIcon";
 import classes from "@/assets/stylesheets/SearchBar.module.css";
 
-const SearchBar = () => {
-  const [value, setValue] = useState("");
+const SearchBar = ({
+  value,
+  setValue
+}: {value: string, setValue: (arg: string) => void}) => {
 
   return (
     <Flex direction="row" align="center" className={classes.flexbox}>
