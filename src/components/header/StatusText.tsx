@@ -8,7 +8,7 @@ import CircleAlertIcon from "@/assets/icons/CircleAlertIcon";
 
 interface StatusTextProps {
   status: Status;
-  quality: Quality;
+  quality?: Quality;
   withBorder?: boolean;
 }
 
@@ -26,7 +26,7 @@ const StatusText = ({status, quality, withBorder=false}: StatusTextProps) => {
               <CircleFilledIcon color={StatusIndicator(status)} size="9" /> :
               <CircleAlertIcon color="var(--mantine-color-elv-orange-3)" />
           }
-          <Text size="sm" ml="md">
+          <Text size={withBorder ? "xs" : "sm"} ml={withBorder ? "xs" : "md"}>
             {statusText}
           </Text>
         </Group>

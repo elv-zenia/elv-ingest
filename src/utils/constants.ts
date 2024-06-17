@@ -3,9 +3,10 @@ import PlayoutPanel from "@/pages/create/PlayoutPanel";
 import PreviewPanel from "@/pages/create/PreviewPanel";
 import ProgressPanel from "@/pages/create/ProgressPanel";
 import Content from "@/pages/content/Content";
-import ContentItemNew from "@/pages/content/ContentItemNew";
+import ContentItemNew from "@/pages/content/new/ContentItemNew";
 import Streams from "@/pages/streams/Streams";
 import {Codec, Format, Quality, Status} from "components/components";
+import StreamDetails from "@/pages/stream-details/StreamDetails";
 
 export const CONTENT_COLUMNS = [
   {title: "Name"},
@@ -32,19 +33,20 @@ export const ROUTES = [
   // Ingest routes
   {
     path: "/content",
-    Component: Content,
-    label: "Content"
+    Component: Content
   },
   {
     path: "/content/new",
-    Component: ContentItemNew,
-    label: "New"
+    Component: ContentItemNew
   },
   // Live Stream routes
   {
     path: "/streams",
-    Component: Streams,
-    label: "Streams"
+    Component: Streams
+  },
+  {
+    path: "/streams/:id",
+    Component: StreamDetails
   }
 ];
 

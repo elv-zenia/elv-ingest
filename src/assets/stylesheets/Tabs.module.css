@@ -1,0 +1,10 @@
+.tab {
+  color: var(--mantine-color-elv-neutral-4);
+  font-weight: 700;
+
+  &[data-active] {
+    border-width: 0 0 5px;
+    color: var(--mantine-color-elv-violet-11);
+    padding: var(--mantine-spacing-md) var(--mantine-spacing-md);
+  }
+}

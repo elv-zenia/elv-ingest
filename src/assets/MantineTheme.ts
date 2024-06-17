@@ -39,7 +39,7 @@ const theme: PartialObjectDeep<MantineTheme, object> = createTheme({
     ],
     "elv-neutral": [
       "#f8f2fe",
-      "#e8e4ed",
+      "rgba(169, 160, 178, 0.20)", // eluvio color
       "#cdc8d3",
       "#b2aaba", // eluvio color
       "#a9a0b2", // eluvio color
@@ -104,7 +104,8 @@ const theme: PartialObjectDeep<MantineTheme, object> = createTheme({
       styles: () => ({
         list: {
           "--tab-border-color": "var(--mantine-color-elv-neutral-4)",
-          "--tabs-list-border-size": "1px"
+          "--tabs-list-border-size": "1px",
+          "--tabs-color": "var(--mantine-color-elv-violet-11)"
         }
       })
     },

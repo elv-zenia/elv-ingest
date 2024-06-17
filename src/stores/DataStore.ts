@@ -1,6 +1,13 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
-import {IngestJobProps, StatusProps, StreamMap, StreamProps} from "components/components";
+import {
+  IngestJobProps,
+  LiveRecordingConfigProps,
+  LiveRecordingCopiesProps,
+  StatusProps,
+  StreamMap,
+  StreamProps
+} from "components/components";
 
 interface ContentProps {
   title: string;
@@ -23,6 +30,7 @@ class DataStore {
   jobs: IngestJobProps | null = {};
   streams: StreamMap = {};
   loadingStatus = false;
+  streamSlugIdMap: {[key: string]: string} = {};
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this);
@@ -34,6 +42,23 @@ class DataStore {
 
   get client() {
     return this.rootStore.client;
+  }
+
+  StreamIdToSlug({objectId}: {objectId: string}): string {
+    if(!Object.hasOwn(this.streamSlugIdMap, objectId)) {
+      const slug = Object.keys(this.streams || {}).find(streamSlug => (
+        this.streams[streamSlug].objectId === objectId
+      ));
+
+      if(slug) {
+        this.streamSlugIdMap[objectId] = slug;
+      } else {
+        console.error(`Unable to find slug for ${objectId}`);
+        return "";
+      }
+    }
+
+    return this.streamSlugIdMap[objectId];
   }
 
   *LoadTenantData(): unknown {
@@ -179,7 +204,7 @@ class DataStore {
     stopLro=false,
     showParams=false,
     update=false
-  }: {objectId: string, slug?: string, stopLro?: boolean, showParams?: boolean, update?: boolean}): Generator<StatusProps> | Promise<StatusProps> {
+  }: {objectId: string, slug?: string, stopLro?: boolean, showParams?: boolean, update?: boolean}): Promise<StatusProps> | Generator<StatusProps> {
     try {
       const response = (yield this.client.StreamStatus({
         name: objectId,
@@ -300,6 +325,40 @@ class DataStore {
     }
   }
 
+  *LoadEdgeWriteTokenData({objectId, libraryId}: {objectId: string, libraryId?: string}): Generator<LiveRecordingCopiesProps> | Promise<LiveRecordingCopiesProps> {
+    try {
+      if(!libraryId) {
+        libraryId = yield this.client.ContentObjectLibraryId({objectId});
+      }
+
+
+      const edgeWriteToken = yield this.client.ContentObjectMetadata({
+        objectId,
+        libraryId,
+        metadataSubtree: "/live_recording/fabric_config/edge_write_token"
+      });
+
+      if(!edgeWriteToken) { return {}; }
+
+      const metadata = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        writeToken: edgeWriteToken,
+        metadataSubtree: "live_recording",
+        select: ["recordings", "recording_config"]
+      }) as LiveRecordingConfigProps;
+
+      return {
+        // First stream recording start time
+        _recordingStartTime: metadata?.recording_config?.recording_start_time,
+        ...metadata?.recordings
+      };
+    } catch(error) {
+      console.error("Unable to load metadata with edge write token", error);
+      return {};
+    }
+  }
+
   LoadIngestJobs(): void {
     const localStorageJobs = localStorage.getItem("elv-jobs");
     if(localStorageJobs) {
@@ -329,6 +388,41 @@ class DataStore {
       ...value,
       slug: key
     };
+  }
+
+  *ListenForUpdate({libraryId, objectId}: {libraryId?: string, objectId: string}): Generator<EventSource> | Promise<EventSource> {
+    if(!libraryId) {
+      libraryId = (yield this.client.ContentObjectLibraryId({objectId})) as string;
+    }
+
+    // const token = yield this.client.CreateSignedToken({
+    //   objectId,
+    //   duration: 24 * 60 * 60 * 1000,
+    // });
+
+    // TODO: Update watch routes
+    const rep = yield this.client.FabricUrl({
+      libraryId,
+      objectId,
+      rep: "/watch/meta/public",
+      noAuth: true
+    });
+
+    const url = rep.replace("/rep/", "/");
+
+    // const headers = { Authorization: "Bearer " + token };
+    const eventSource = new EventSource(url);
+
+    eventSource.onmessage = event => {
+      console.log("onmessage - event", event);
+      console.log("new data", JSON.parse(event.data));
+    };
+
+    eventSource.onerror = function(event) {
+      console.error("EventSource failed:", event);
+    };
+
+    return eventSource;
   }
 }
 

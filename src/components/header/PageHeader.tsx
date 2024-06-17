@@ -3,6 +3,8 @@ import {observer} from "mobx-react-lite";
 import SearchBar from "@/components/header/SearchBar";
 import JobsActivity from "@/components/header/JobsActivity";
 import TopActions, {ActionProps} from "@/components/header/TopActions";
+import {Status} from "components/components";
+import StatusText from "@/components/header/StatusText";
 
 interface PageHeaderProps {
   title: string;
@@ -11,6 +13,7 @@ interface PageHeaderProps {
   actions?: ActionProps[];
   searchValue?: string;
   SearchValueCallback?: (arg: string) => void;
+  status?: Status
 }
 
 const PageHeader = observer(({
@@ -20,6 +23,7 @@ const PageHeader = observer(({
   actions=[],
   searchValue,
   SearchValueCallback,
+  status
 }: PageHeaderProps) => {
   return (
     <Flex direction="column" mb="15px">
@@ -31,7 +35,16 @@ const PageHeader = observer(({
         }
         {showJobsButton && <JobsActivity />}
       </Flex>
-      {title && <Title size="h3" mt="32px">{title}</Title>}
+      {
+        title &&
+        <Flex direction="row" align="center" mt="32px" gap={10}>
+          <Title size="h3">{title}</Title>
+          {
+            status &&
+            <StatusText status={status} withBorder />
+          }
+        </Flex>
+      }
     </Flex>
   );
 });
