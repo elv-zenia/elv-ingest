@@ -1,7 +1,7 @@
 import {observer} from "mobx-react-lite";
 import {BrowserRouter} from "react-router-dom";
 
-import {AppShell, MantineProvider} from "@mantine/core";
+import {AppShell, Box, MantineProvider} from "@mantine/core";
 import "@mantine/core/styles.css";
 import "mantine-datatable/styles.css";
 
@@ -12,26 +12,30 @@ import "@/assets/stylesheets/reset.css";
 import SideNavigation from "@/components/navigation/SideNavigation";
 import DataWrapper from "@/components/DataWrapper";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
+import ErrorBanner from "@/components/error/ErrorBanner";
 
 const App = observer(() => {
   return (
     // TODO: Support color scheme switching
     <MantineProvider withCssVariables defaultColorScheme="light" theme={MantineTheme}>
       <BrowserRouter>
-        <AppShell padding="lg" navbar={{width: 210, breakpoint: "sm"}}>
+        <AppShell padding="0" navbar={{width: 210, breakpoint: "sm"}}>
           <SideNavigation />
           <AppShell.Main>
-            {
-              rootStore.loaded ?
-                (
-                  <DataWrapper>
-                    <ErrorBoundary>
-                      <AppRoutes />
-                    </ErrorBoundary>
-                  </DataWrapper>
-                ) :
-                null
-            }
+            <ErrorBanner />
+            <Box p="lg">
+              {
+                rootStore.loaded ?
+                  (
+                    <DataWrapper>
+                      <ErrorBoundary>
+                        <AppRoutes />
+                      </ErrorBoundary>
+                    </DataWrapper>
+                  ) :
+                  null
+              }
+            </Box>
           </AppShell.Main>
         </AppShell>
       </BrowserRouter>

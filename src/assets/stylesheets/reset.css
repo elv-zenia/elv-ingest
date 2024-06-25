@@ -68,7 +68,3 @@ table {
 textarea {
   white-space: revert;
 }
-
-.mantine-datatable-empty-state {
-  padding-top: 0 !important;
-}

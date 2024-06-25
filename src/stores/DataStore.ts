@@ -1,6 +1,9 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
 import {
+  AudioFormDataProps,
+  // AudioStreamMapProps,
+  AudioStreamProps,
   IngestJobProps,
   LiveRecordingConfigProps,
   LiveRecordingCopiesProps,
@@ -8,6 +11,7 @@ import {
   StreamMap,
   StreamProps
 } from "components/components";
+import {RECORDING_BITRATE_OPTIONS} from "@/utils/constants";
 
 interface ContentProps {
   title: string;
@@ -65,6 +69,16 @@ class DataStore {
     try {
       this.tenantId = yield this.client.userProfileClient.TenantContractId();
 
+      if(!this.tenantId) {
+        throw "Tenant ID not found";
+      }
+    } catch(error) {
+      this.rootStore.uiStore.SetErrorMessage({message: "Error: Unable to determine tenant info"});
+      console.error(error);
+      throw Error("No tenant contract ID found.");
+    }
+
+    try {
       const response = yield this.client.ContentObjectMetadata({
         libraryId: this.tenantId.replace("iten", "ilib"),
         objectId: this.tenantId.replace("iten", "iq__"),
@@ -88,7 +102,7 @@ class DataStore {
       [{key: "liveStream", value: sites?.live_streams}, {key: "ingest", value: sites?.ingest}]
         .forEach(({key, value}) => this.siteObjects[key as keyof SiteObjectProps] = value);
     } catch(error) {
-      // this.rootStore.SetErrorMessage("Error: Unable to load tenant sites");
+      this.rootStore.uiStore.SetErrorMessage({message: "Error: Unable to load tenant sites"});
       console.error(error);
       throw Error("Unable to load sites for current tenant.");
     }
@@ -129,6 +143,7 @@ class DataStore {
 
       streamMetadata = siteMetadata?.public?.asset_metadata?.live_streams;
     } catch(error) {
+      this.rootStore.uiStore.SetErrorMessage({message: "Error: Unable to load tenant sites"});
       throw Error(`Unable to load live streams for site ${this.siteId}.`);
     }
 
@@ -331,7 +346,6 @@ class DataStore {
         libraryId = yield this.client.ContentObjectLibraryId({objectId});
       }
 
-
       const edgeWriteToken = yield this.client.ContentObjectMetadata({
         objectId,
         libraryId,
@@ -356,6 +370,69 @@ class DataStore {
     } catch(error) {
       console.error("Unable to load metadata with edge write token", error);
       return {};
+    }
+  }
+
+  *LoadStreamProbeData({
+    objectId,
+    libraryId
+  }: {objectId?: string, libraryId?: string}): Generator<{ audioData: AudioFormDataProps, audioStreams: object[]}> | Promise<{ audioData: AudioFormDataProps, audioStreams: object[]}> {
+    try {
+      if(!libraryId) {
+        libraryId = yield this.client.ContentObjectLibraryId({objectId});
+      }
+
+      let probeMetadata = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "live_recording_config/probe_info",
+      });
+
+      // Phase out as new streams will have live_recording_config/probe_info
+      if(!probeMetadata) {
+        probeMetadata = yield this.client.ContentObjectMetadata({
+          libraryId,
+          objectId,
+          metadataSubtree: "live_recording/probe_info",
+        });
+      }
+
+      if(!probeMetadata) {
+        return {audioStreams: [], audioData: {}};
+      }
+
+      const audioConfig = yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "live_recording_config/audio"
+      });
+
+      const audioStreams: AudioStreamProps[] = (probeMetadata.streams || []).filter((stream: AudioStreamProps) => stream.codec_type === "audio");
+
+      // Map used for form data
+      const audioData: AudioFormDataProps = {};
+      audioStreams.forEach(spec => {
+        const audioConfigForIndex = audioConfig && audioConfig[spec.stream_index] ? audioConfig[spec.stream_index] : {};
+
+        const initBitrate = RECORDING_BITRATE_OPTIONS.map(option => option.value).includes(spec.bit_rate) ? spec.bit_rate : "192000";
+
+        audioData[spec.stream_index] = {
+          bitrate: spec.bit_rate,
+          codec: spec.codec_name,
+          record: Object.hasOwn(audioConfigForIndex, "record") ? audioConfigForIndex.record : true,
+          recording_bitrate: initBitrate.toString(),
+          recording_channels: spec.channels,
+          playout: Object.hasOwn(audioConfigForIndex, "playout") ? audioConfigForIndex.playout : true,
+          playout_label: audioConfigForIndex.playout_label || `Audio ${spec.stream_index}`
+        };
+      });
+
+      return {
+        audioStreams,
+        audioData
+      };
+    } catch(error) {
+      console.error("Unable to load live_recording metadata", error);
     }
   }
 

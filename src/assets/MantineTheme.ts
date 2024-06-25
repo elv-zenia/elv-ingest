@@ -104,7 +104,7 @@ const theme: PartialObjectDeep<MantineTheme, object> = createTheme({
       styles: () => ({
         list: {
           "--tab-border-color": "var(--mantine-color-elv-neutral-4)",
-          "--tabs-list-border-size": "1px",
+          "--tabs-list-border-size": "0",
           "--tabs-color": "var(--mantine-color-elv-violet-11)"
         }
       })

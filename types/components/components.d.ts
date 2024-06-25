@@ -1,4 +1,5 @@
 import {STATUS_MAP, QUALITY_MAP, FORMAT_TEXT, CODEC_TEXT} from "@/utils/constants";
+import {Dispatch, SetStateAction} from "react";
 
 type StreamMap = { [key: string]: StreamProps };
 type Status = typeof STATUS_MAP[keyof typeof STATUS_MAP];
@@ -7,6 +8,9 @@ type Quality = typeof QUALITY_MAP[keyof typeof QUALITY_MAP];
 type Format = keyof FORMAT_TEXT;
 type Codec = keyof CODEC_TEXT;
 
+/**
+ * Represents the properties of an Icon component.
+ */
 interface IconProps {
   className?: string;
   color?: string;
@@ -18,6 +22,9 @@ interface IngestJobProps {
   objectId?: string;
 }
 
+/**
+ * Represents an individual stream cached as streams in DataStore.
+ */
 interface StreamProps {
   objectId?: string;
   slug?: string;
@@ -40,6 +47,9 @@ interface StreamProps {
   quality: Quality;
 }
 
+/**
+ * Represents live_recording/recording_config/recording_params/ladder_specs.
+ */
 interface LadderSpecProps {
   bit_rate: number,
   codecs: string,
@@ -52,6 +62,9 @@ interface LadderSpecProps {
   width: number
 }
 
+/**
+ * Represents metdata parsed and saved to /live_recording_config.
+ */
 interface LiveConfigProps {
   drm?: string;
   drm_type: string;
@@ -60,6 +73,9 @@ interface LiveConfigProps {
   reference_url: string;
 }
 
+/**
+ * Represents live_offerings when retrieving live_recording/recordings using the edge write token.
+ */
 interface LiveOfferingRecordingProps {
   audio_mez_duration_ts: number;
   current_parts: {
@@ -94,6 +110,9 @@ interface LiveOfferingRecordingProps {
   video_mez_duration_ts: number;
 }
 
+/**
+ * Represents the status of a stream from Client.StreamStatus.
+ */
 interface StatusProps {
   name: string;
   library_id: string;
@@ -127,12 +146,18 @@ interface StatusProps {
   state: Status;
 }
 
+/**
+ * Used to represent recording data for stream details.
+ */
 interface LiveRecordingCopiesProps {
   _recordingStartTime: number;
   live_offering: LiveOfferingRecordingProps[],
   recording_sequence: number;
 }
 
+/**
+ * Represents live_recording_config metadata.
+ */
 interface LiveRecordingConfigProps {
   recording_config: {
     recording_params: {
@@ -195,6 +220,69 @@ interface LiveRecordingConfigProps {
     live_offering: LiveOfferingRecordingProps[],
     recording_sequence: number;
   }
+}
+
+/**
+ * Represents form elements (checkboxes and inputs) for audio tracks table.
+ */
+interface AudioFormDataProps {
+  [key: number]: {
+    playout: boolean;
+    bitrate: string;
+    codec: "aac" | "mp3" | "mp2" | "mp4a";
+    recording_bitrate: string;
+    recording_channels: number;
+    record: boolean;
+    playout_label: string;
+  }
+}
+
+/**
+ * Represents metadata of an individual stream, as specified in the AudioStreamMap Props.
+ */
+interface AudioStreamProps {
+  avg_frame_rate: string;
+  bit_rate: string;
+  channel_layout: number;
+  channels: number;
+  codec_id: number;
+  codec_name: "aac" | "mp3" | "mp2" | "mp4a";
+  codec_type: "audio" | "video";
+  display_aspect_ratio: string;
+  duration_ts: number;
+  frame_rate: string;
+  has_b_frame: false
+  level: number;
+  pix_fmt: number;
+  profile: number;
+  sample_aspect_ratio: string;
+  sample_rate: number;
+  start_time: number;
+  stream_id: number;
+  stream_index: number;
+  ticks_per_frame: number;
+  time_base: string;
+}
+
+/**
+ * Represents metadata at the specified path live_recording_config/probe_info/streams.
+ */
+type AudioStreamMapProps = {
+  [key: number]: AudioStreamProps
+}
+
+/**
+ * Represents the properties of the AudioTracksTable component.
+ */
+interface AudioTracksTableProps {
+  records: {
+    stream_index: number;
+    codec_name: string;
+    bit_rate: number;
+  }[];
+  audioFormData?: AudioFormDataProps;
+  setAudioFormData: Dispatch<SetStateAction<AudioFormDataProps | undefined>>;
+  disabled?: boolean;
 }
 
 interface WatchMetadataProps {

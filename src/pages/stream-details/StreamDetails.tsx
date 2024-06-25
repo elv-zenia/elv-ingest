@@ -3,27 +3,31 @@ import PageHeader from "@/components/header/PageHeader";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {dataStore} from "@/stores";
-import {Loader, Tabs} from "@mantine/core";
+import {Loader} from "@mantine/core";
 import {LiveRecordingCopiesProps} from "components/components";
 import {useNavigate} from "react-router-dom";
-import classes from "@/assets/stylesheets/Tabs.module.css";
 import {flowResult} from "mobx";
+import TabToolbar from "@/components/common/TabToolbar";
+import AudioPanel from "@/pages/stream-details/audio/AudioPanel";
 
 const StreamDetails = observer(() => {
   const params = useParams();
   const [streamSlug, setStreamSlug] = useState("");
   const [recordingData, setRecordingData] = useState<LiveRecordingCopiesProps | null>(null);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string|null>("details");
   const [status, setStatus] = useState("");
 
   const TABS = [
-    {title: "Details", value: "details"},
-    // {title: "Ingest", value: "ingest"},
-    // {title: "Status", value: "status"},
-    {title: "Playout", value: "playout"},
-    {title: "Audio", value: "audio"}
-    // {title: "View Stream", value: "view-stream"},
+    {label: "Details", value: "details", Component: () => <div></div>},
+    // {label: "Ingest", value: "ingest"},
+    // {label: "Status", value: "status"},
+    {label: "Playout", value: "playout", Component: () => <div></div>},
+    {label: "Audio", value: "audio", Component: AudioPanel}
+    // {label: "View Stream", value: "view-stream"},
+  ];
+
+  const RIGHT_ACTIONS = [
+    {label: "Start", OnClick: () => {}}
   ];
 
   const LoadStatus = async () => {
@@ -38,9 +42,9 @@ const StreamDetails = observer(() => {
   };
 
   const LoadEdgeWriteTokenData = async() => {
-    const metadata = await dataStore.LoadEdgeWriteTokenData({
+    const metadata = await flowResult(dataStore.LoadEdgeWriteTokenData({
       objectId: params.id!
-    }) as LiveRecordingCopiesProps;
+    })) as LiveRecordingCopiesProps;
 
     if(metadata) {
       metadata.live_offering = (metadata.live_offering || []).map((item, i) => ({
@@ -55,7 +59,7 @@ const StreamDetails = observer(() => {
   useEffect(() => {
     let eventSource: EventSource;
     const Load = async() => {
-      if(!dataStore.streams) {
+      if(!dataStore.streams || Object.keys(dataStore.streams || {}).length < 1) {
         await dataStore.LoadAllStreamData();
         await dataStore.LoadAllStreamStatus();
       }
@@ -100,21 +104,11 @@ const StreamDetails = observer(() => {
           }
         ]}
       />
-      <Tabs value={activeTab} onChange={setActiveTab}>
-        <Tabs.List>
-          {
-            TABS.map(({value, title}) => (
-              <Tabs.Tab
-                className={classes.tab}
-                value={value}
-                key={`tabs-${value}`}
-              >
-                { title }
-              </Tabs.Tab>
-            ))
-          }
-        </Tabs.List>
-      </Tabs>
+      <TabToolbar
+        defaultTab="details"
+        tabs={TABS}
+        rightActions={RIGHT_ACTIONS}
+      />
     </>
   );
 });
