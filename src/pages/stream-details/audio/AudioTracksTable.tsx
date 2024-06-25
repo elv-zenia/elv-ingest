@@ -3,7 +3,7 @@ import {DataTable} from "mantine-datatable";
 import {Checkbox, Select, Text, TextInput} from "@mantine/core";
 import {AudioBitrateReadable, AudioCodec} from "@/utils/helpers";
 import {RECORDING_BITRATE_OPTIONS} from "@/utils/constants";
-import {AudioFormDataProps, AudioTracksTableProps} from "components/components";
+import {AudioFormDataProps, AudioTracksTableProps} from "components/stream";
 
 const AudioTracksTable = observer(({
   records,
@@ -30,10 +30,13 @@ const AudioTracksTable = observer(({
     <DataTable
       idAccessor="stream_index"
       noRecordsText="No audio tracks found"
-      minHeight={records.length > 0 ? 350 : 200}
+      minHeight={records.length > 0 ? 150 : 125}
       fetching={!disabled && !audioFormData}
       records={records}
       withColumnBorders
+      emptyState={
+        <Text c="dimmed" size="sm">No audio tracks available</Text>
+      }
       groups={[
         {
           id: "input",

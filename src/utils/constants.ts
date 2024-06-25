@@ -5,7 +5,7 @@ import ProgressPanel from "@/pages/create/ProgressPanel";
 import Content from "@/pages/content/Content";
 import ContentItemNew from "@/pages/content/new/ContentItemNew";
 import Streams from "@/pages/streams/Streams";
-import {Codec, Format, Quality, Status} from "components/components";
+import {Codec, Format, Quality, Status} from "components/stream";
 import StreamDetails from "@/pages/stream-details/StreamDetails";
 
 export const CONTENT_COLUMNS = [

@@ -2,9 +2,9 @@ import {observer} from "mobx-react-lite";
 import PageHeader from "@/components/header/PageHeader";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router";
-import {dataStore} from "@/stores";
+import {streamStore} from "@/stores";
 import {Loader} from "@mantine/core";
-import {LiveRecordingCopiesProps} from "components/components";
+import {LiveRecordingCopiesProps} from "components/stream";
 import {useNavigate} from "react-router-dom";
 import {flowResult} from "mobx";
 import TabToolbar from "@/components/common/TabToolbar";
@@ -31,7 +31,7 @@ const StreamDetails = observer(() => {
   ];
 
   const LoadStatus = async () => {
-    const response = await flowResult(dataStore.LoadStreamStatus({
+    const response = await flowResult(streamStore.LoadStreamStatus({
       objectId: params.id!,
       update: true
     }));
@@ -42,7 +42,7 @@ const StreamDetails = observer(() => {
   };
 
   const LoadEdgeWriteTokenData = async() => {
-    const metadata = await flowResult(dataStore.LoadEdgeWriteTokenData({
+    const metadata = await flowResult(streamStore.LoadEdgeWriteTokenData({
       objectId: params.id!
     })) as LiveRecordingCopiesProps;
 
@@ -59,18 +59,18 @@ const StreamDetails = observer(() => {
   useEffect(() => {
     let eventSource: EventSource;
     const Load = async() => {
-      if(!dataStore.streams || Object.keys(dataStore.streams || {}).length < 1) {
-        await dataStore.LoadAllStreamData();
-        await dataStore.LoadAllStreamStatus();
+      if(!streamStore.streams || Object.keys(streamStore.streams || {}).length < 1) {
+        await streamStore.LoadAllStreamData();
+        await streamStore.LoadAllStreamStatus();
       }
 
       if(params.id) {
-        const slug = dataStore.StreamIdToSlug({objectId: params.id});
+        const slug = streamStore.StreamIdToSlug({objectId: params.id});
         setStreamSlug(slug);
 
         await LoadStatus();
         await LoadEdgeWriteTokenData();
-        // eventSource = await dataStore.ListenForUpdate({objectId: params.id}) as EventSource;
+        // eventSource = await streamStore.ListenForUpdate({objectId: params.id}) as EventSource;
       }
     };
 
@@ -81,7 +81,7 @@ const StreamDetails = observer(() => {
     };
   }, [params.id]);
 
-  const stream = dataStore.streams[streamSlug];
+  const stream = streamStore.streams[streamSlug];
 
   if(!stream) { return <Loader />; }
 

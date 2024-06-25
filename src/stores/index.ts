@@ -1,7 +1,8 @@
 import {configure, makeAutoObservable, runInAction} from "mobx";
 import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
-import DataStore from "@/stores/DataStore";
+import StreamStore from "@/stores/StreamStore";
 import UiStore from "@/stores/UiStore";
+import IngestStore from "@/stores/IngestStore";
 
 // Force strict mode so mutations are only allowed within actions.
 configure({
@@ -12,8 +13,10 @@ export class RootStore {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: any;
   loaded = false;
-  dataStore!: DataStore;
+  streamStore!: StreamStore;
+  ingestStore!: IngestStore;
   uiStore!: UiStore;
+  tenantId = "";
 
   constructor() {
     makeAutoObservable(this);
@@ -21,7 +24,8 @@ export class RootStore {
     this.Initialize();
 
     runInAction(() => {
-      this.dataStore = new DataStore(this);
+      this.streamStore = new StreamStore(this);
+      this.ingestStore = new IngestStore(this);
       this.uiStore = new UiStore(this);
     });
   }
@@ -42,6 +46,20 @@ export class RootStore {
     }
   };
 
+  *LoadTenantData(): unknown {
+    try {
+      this.tenantId = yield this.client.userProfileClient.TenantContractId();
+
+      if(!this.tenantId) {
+        throw "Tenant ID not found";
+      }
+    } catch(error) {
+      this.uiStore.SetErrorMessage({message: "Error: Unable to determine tenant info"});
+      console.error(error);
+      throw Error("No tenant contract ID found.");
+    }
+  }
+
   Decode({text}: {text: string}) {
     if(!text || typeof(text) !== "string") {
       throw Error("Invalid value provided. Must be a string.");
@@ -52,7 +70,8 @@ export class RootStore {
 }
 
 export const rootStore = new RootStore();
-export const dataStore = rootStore.dataStore;
+export const streamStore = rootStore.streamStore;
+export const ingestStore = rootStore.ingestStore;
 export const uiStore = rootStore.uiStore;
 
 window.rootStore = rootStore;

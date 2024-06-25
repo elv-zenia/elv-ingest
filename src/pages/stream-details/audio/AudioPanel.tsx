@@ -3,9 +3,10 @@ import {Box, Loader} from "@mantine/core";
 import {useParams} from "react-router";
 import {FormEventHandler, useEffect, useState} from "react";
 import AudioTracksTable from "@/pages/stream-details/audio/AudioTracksTable";
-import {dataStore} from "@/stores";
+import {streamStore} from "@/stores";
 import {flowResult} from "mobx";
-import {AudioFormDataProps} from "components/components";
+import {AudioFormDataProps} from "components/stream";
+import Button from "@/components/common/Button";
 
 const AudioPanel = observer(() => {
   const params = useParams();
@@ -14,7 +15,7 @@ const AudioPanel = observer(() => {
   const [applyingChanges, setApplyingChanges] = useState(false);
 
   const LoadConfigData = async () => {
-    const {audioStreams, audioData} = await flowResult(dataStore.LoadStreamProbeData({
+    const {audioStreams, audioData} = await flowResult(streamStore.LoadStreamProbeData({
       objectId: params.id
     }));
 
@@ -68,13 +69,13 @@ const AudioPanel = observer(() => {
             setAudioFormData={setFormData}
           />
           <Box mt="24px">
-            <button
+            <Button
               type="submit"
-              className="button__primary"
               disabled={applyingChanges}
+              uppercase
             >
               {applyingChanges ? <Loader type="dots" className="modal__loader"/> : "Apply"}
-            </button>
+            </Button>
           </Box>
         </form>
       </Box>

@@ -1,6 +1,6 @@
 import {observer} from "mobx-react-lite";
 import {ReactNode, useEffect} from "react";
-import {dataStore} from "@/stores";
+import {rootStore, streamStore} from "@/stores";
 
 interface DataWrapperProps {
   children: ReactNode;
@@ -9,8 +9,8 @@ interface DataWrapperProps {
 const DataWrapper = observer(({children}: DataWrapperProps) => {
   useEffect(() => {
     const Load = async() => {
-      await dataStore.LoadTenantData();
-      await dataStore.LoadSiteData();
+      await rootStore.LoadTenantData();
+      await streamStore.LoadSiteData();
     };
 
     Load();

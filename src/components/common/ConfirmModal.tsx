@@ -1,7 +1,7 @@
 import React, {SetStateAction, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {Flex, Modal, Text} from "@mantine/core";
-import {ElvError} from "components/components";
+import {ElvError} from "components/stream";
 
 interface ConfirmModalProps {
   message: string;

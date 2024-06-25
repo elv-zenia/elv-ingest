@@ -2,7 +2,7 @@ import {observer} from "mobx-react-lite";
 import PageHeader from "@/components/header/PageHeader";
 import {DataTable} from "mantine-datatable";
 import {useEffect} from "react";
-import {dataStore} from "@/stores";
+import {ingestStore} from "@/stores";
 import {CONTENT_COLUMNS} from "@/utils/constants";
 import {Flex, Text} from "@mantine/core";
 import CreateDropdown from "@/pages/create/CreateMenu";
@@ -10,13 +10,13 @@ import CreateDropdown from "@/pages/create/CreateMenu";
 const Content = observer(() => {
   useEffect(() => {
     const Initialize = async () => {
-      await dataStore.LoadIngestJobs();
+      await ingestStore.LoadIngestJobs();
     };
 
     Initialize();
   }, []);
 
-  const records = Object.keys(dataStore.jobs || {});
+  const records = Object.keys(ingestStore.jobs || {});
 
   return (
     <>
@@ -30,6 +30,7 @@ const Content = observer(() => {
       </Flex>
       <DataTable
         records={records}
+        minHeight={records.length > 0 ? 150 : 125}
         columns={CONTENT_COLUMNS.map(column => (
           {accessor: column.title, title: column.title}
         ))}

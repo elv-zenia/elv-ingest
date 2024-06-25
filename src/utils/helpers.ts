@@ -1,5 +1,5 @@
 import Fraction from "fraction.js";
-import {LiveConfigProps, Status, StreamProps, StreamTableSortColumns} from "components/components";
+import {LiveConfigProps, Status, StreamProps, StreamTableSortColumns} from "components/stream";
 import {STATUS_MAP} from "@/utils/constants";
 
 export const ParseLiveConfigData = ({

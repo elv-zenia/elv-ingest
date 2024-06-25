@@ -9,21 +9,7 @@ type Format = keyof FORMAT_TEXT;
 type Codec = keyof CODEC_TEXT;
 
 /**
- * Represents the properties of an Icon component.
- */
-interface IconProps {
-  className?: string;
-  color?: string;
-  size?: string;
-}
-
-// TODO: Create jobs type
-interface IngestJobProps {
-  objectId?: string;
-}
-
-/**
- * Represents an individual stream cached as streams in DataStore.
+ * Represents an individual stream cached as streams in StreamStore.
  */
 interface StreamProps {
   objectId?: string;

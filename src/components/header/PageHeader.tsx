@@ -3,7 +3,7 @@ import {observer} from "mobx-react-lite";
 import SearchBar from "@/components/header/SearchBar";
 import JobsActivity from "@/components/header/JobsActivity";
 import TopActions, {ActionProps} from "@/components/header/TopActions";
-import {Status} from "components/components";
+import {Status} from "components/stream";
 import StatusText from "@/components/header/StatusText";
 
 interface PageHeaderProps {

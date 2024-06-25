@@ -5,6 +5,7 @@ import React, {forwardRef} from "react";
 export interface ButtonProps extends MantineButtonProps {
   uppercase?: boolean;
   onClick?: () => null | void;
+  type?: "submit" | "button" | "reset";
 }
 
 const Button = forwardRef(function Button({
@@ -15,6 +16,7 @@ const Button = forwardRef(function Button({
     onClick,
     children,
     size="md",
+    type="button",
     ...rest
   }: ButtonProps, ref: React.ForwardedRef<HTMLButtonElement>) {
   return (
@@ -26,6 +28,7 @@ const Button = forwardRef(function Button({
       leftSection={leftSection}
       rightSection={rightSection}
       onClick={onClick}
+      type={type}
       {...rest}
     >
       <Text tt={uppercase ? "uppercase" : "unset"} size="xs" fw="600">

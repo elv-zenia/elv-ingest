@@ -1,5 +1,3 @@
-import {IconProps} from "components/components";
-
 const CircleAlertIcon = ({className, color}: IconProps) => {
   return (
     <svg className={className} color={color} width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">

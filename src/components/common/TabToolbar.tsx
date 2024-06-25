@@ -35,7 +35,13 @@ const TabToolbar = ({
           </Tabs.List>
           {
             rightActions.map(({label, OnClick}) => (
-              <Button onClick={OnClick} key={`right-action-${label}`}>{ label }</Button>
+              <Button
+                onClick={OnClick}
+                key={`right-action-${label}`}
+                uppercase
+              >
+                { label }
+              </Button>
             ))
           }
         </Flex>

@@ -8,8 +8,8 @@ import {useDebounceCallback, useDebouncedValue} from "@mantine/hooks";
 import PageHeader from "@/components/header/PageHeader";
 import {CODEC_TEXT, FORMAT_TEXT, STATUS_MAP} from "@/utils/constants";
 import {StreamIsActive, SanitizeUrl, VideoBitrateReadable, SortTable} from "@/utils/helpers";
-import {dataStore} from "@/stores";
-import {StreamProps} from "components/components";
+import {streamStore} from "@/stores";
+import {StreamProps} from "components/stream";
 import StatusText from "@/components/header/StatusText";
 
 interface TableCellTextProps {
@@ -42,8 +42,8 @@ const Streams = observer(() => {
   useEffect(() => {
     const Load = async() => {
       try {
-        await dataStore.LoadAllStreamData();
-        await dataStore.LoadAllStreamStatus();
+        await streamStore.LoadAllStreamData();
+        await streamStore.LoadAllStreamStatus();
       } finally {
         setLoading(false);
       }
@@ -53,10 +53,10 @@ const Streams = observer(() => {
   }, []);
 
   const DebouncedRefresh = useDebounceCallback(async() => {
-    await dataStore.LoadAllStreamData();
+    await streamStore.LoadAllStreamData();
   }, 500);
 
-  const records = Object.values(dataStore.streams || {})
+  const records = Object.values(streamStore.streams || {})
     .filter(record => !debouncedSearch || (record.title || "").toLowerCase().includes(debouncedSearch.toLowerCase()))
     .sort(SortTable({sortStatus}));
 
@@ -73,11 +73,14 @@ const Streams = observer(() => {
         withTableBorder
         highlightOnHover
         idAccessor="objectId"
-        minHeight={!records || records.length === 0 ? 150 : 75}
         records={records}
+        minHeight={!records || records.length === 0 ? 150 : 125}
         fetching={loading}
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
+        emptyState={
+          <Text c="dimmed" size="sm">No streams available</Text>
+        }
         columns={[
           { accessor: "title", title: "Name", sortable: true, render: record => (
               <Stack gap={2}>
