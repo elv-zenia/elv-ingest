@@ -1,8 +1,8 @@
 import {STATUS_MAP, QUALITY_MAP, FORMAT_TEXT, CODEC_TEXT} from "@/utils/constants";
 import {Dispatch, SetStateAction} from "react";
 
-type StreamMap = { [key: string]: StreamProps };
-type Status = typeof STATUS_MAP[keyof typeof STATUS_MAP];
+type StreamMap = { [key: string]: Stream };
+type StatusType = typeof STATUS_MAP[keyof typeof STATUS_MAP];
 type StreamTableSortColumns = "title" | "status";
 type Quality = typeof QUALITY_MAP[keyof typeof QUALITY_MAP];
 type Format = keyof FORMAT_TEXT;
@@ -11,7 +11,7 @@ type Codec = keyof CODEC_TEXT;
 /**
  * Represents an individual stream cached as streams in StreamStore.
  */
-interface StreamProps {
+interface Stream {
   objectId?: string;
   slug?: string;
   "."?: {source: string} | undefined;
@@ -29,14 +29,13 @@ interface StreamProps {
   drm?: string;
   simpleWatermark?: string;
   imageWatermark?: string;
-  status?: Status;
-  quality: Quality;
+  status?: StatusType;
 }
 
 /**
  * Represents live_recording/recording_config/recording_params/ladder_specs.
  */
-interface LadderSpecProps {
+interface LadderSpec {
   bit_rate: number,
   codecs: string,
   height: number,
@@ -49,20 +48,35 @@ interface LadderSpecProps {
 }
 
 /**
- * Represents metdata parsed and saved to /live_recording_config.
+ * Represents metadata parsed and saved to /live_recording_config.
  */
-interface LiveConfigProps {
+interface LiveRecordingConfig {
   drm?: string;
   drm_type: string;
-  audio: object | null;
+  audio?: {
+    [key: string]: LiveRecordingConfigAudioStream
+  };
   part_ttl: number;
   reference_url: string;
+  probe_info?: ProbeInfo
+}
+
+/**
+ * Represents probe data stored at live_recording_config/probe_info
+ */
+interface ProbeInfo {
+  format: {
+    duration: number;
+    filename: string;
+    format_name: string;
+  };
+  streams: AudioStream[];
 }
 
 /**
  * Represents live_offerings when retrieving live_recording/recordings using the edge write token.
  */
-interface LiveOfferingRecordingProps {
+interface LiveOfferingRecording {
   audio_mez_duration_ts: number;
   current_parts: {
     [key: string]: {
@@ -99,7 +113,7 @@ interface LiveOfferingRecordingProps {
 /**
  * Represents the status of a stream from Client.StreamStatus.
  */
-interface StatusProps {
+interface Status {
   name: string;
   library_id: string;
   object_id: string;
@@ -129,26 +143,26 @@ interface StatusProps {
   }
   warnings: string[];
   quality: Quality;
-  state: Status;
+  state: StatusType;
 }
 
 /**
  * Used to represent recording data for stream details.
  */
-interface LiveRecordingCopiesProps {
+interface LiveRecordingCopies {
   _recordingStartTime: number;
-  live_offering: LiveOfferingRecordingProps[],
+  live_offering: LiveOfferingRecording[],
   recording_sequence: number;
 }
 
 /**
- * Represents live_recording_config metadata.
+ * Represents /live_recording metadata.
  */
-interface LiveRecordingConfigProps {
+interface LiveRecording {
   recording_config: {
     recording_params: {
       description: string;
-      ladder_specs: LadderSpecProps[],
+      ladder_specs: LadderSpec[],
       listen: boolean;
       live_delay_nano: number;
       max_duration_sec: number;
@@ -203,20 +217,52 @@ interface LiveRecordingConfigProps {
     recording_stop_time: number;
   },
   recordings: {
-    live_offering: LiveOfferingRecordingProps[],
+    live_offering: LiveOfferingRecording[],
     recording_sequence: number;
+  }
+}
+
+/**
+ * Represents recording status data for running streams retrieved from StreamStatus at /recording_status
+ */
+interface LroRecordingStatus {
+  [key: string]: {
+    bytes_written: number;
+    decode_start_pts: number;
+    decode_start_time: string;
+    finalized_parts: number;
+    first_key_frame_pts: number;
+    first_key_frame_time: string;
+    frames_read: number;
+    frames_written: {
+      segment_frames_written: number;
+      total_frames_written: number;
+    };
+  }
+  video: {
+    bytes_written: number;
+    decode_start_pts: number;
+    decode_start_time: string;
+    finalized_parts: number;
+    first_key_frame_pts: number;
+    first_key_frame_time: string;
+    frames_read: number;
+    frames_written: {
+      total_frames_written: number;
+      segment_frames_written: number;
+    }
   }
 }
 
 /**
  * Represents form elements (checkboxes and inputs) for audio tracks table.
  */
-interface AudioFormDataProps {
+interface AudioFormData {
   [key: number]: {
     playout: boolean;
-    bitrate: string;
+    bitrate: number;
     codec: "aac" | "mp3" | "mp2" | "mp4a";
-    recording_bitrate: string;
+    recording_bitrate: number; // Must be a string for Mantine dropdown option
     recording_channels: number;
     record: boolean;
     playout_label: string;
@@ -226,9 +272,9 @@ interface AudioFormDataProps {
 /**
  * Represents metadata of an individual stream, as specified in the AudioStreamMap Props.
  */
-interface AudioStreamProps {
+interface AudioStream {
   avg_frame_rate: string;
-  bit_rate: string;
+  bit_rate: number;
   channel_layout: number;
   channels: number;
   codec_id: number;
@@ -237,7 +283,8 @@ interface AudioStreamProps {
   display_aspect_ratio: string;
   duration_ts: number;
   frame_rate: string;
-  has_b_frame: false
+  has_b_frame: false;
+  height: number;
   level: number;
   pix_fmt: number;
   profile: number;
@@ -248,13 +295,36 @@ interface AudioStreamProps {
   stream_index: number;
   ticks_per_frame: number;
   time_base: string;
+  width: number;
 }
 
 /**
+ * Represents settings for customizing audio streams
+ */
+interface AudioStreamCustomSettingsPayload {
+  audio?: {
+    [key: string]: LiveRecordingConfigAudioStream
+  };
+  edge_write_token?: string;
+  part_ttl?: number;
+}
+
+/**
+ * Represents audio stream data stored at /live_recording_config/audio
+ */
+interface LiveRecordingConfigAudioStream {
+  playout: boolean;
+  playout_label: string;
+  record: boolean;
+ recording_bitrate: number;
+ recording_channels: number;
+ }
+
+ /**
  * Represents metadata at the specified path live_recording_config/probe_info/streams.
  */
-type AudioStreamMapProps = {
-  [key: number]: AudioStreamProps
+interface AudioStreamMapPayload {
+  [key: string]: LiveRecordingConfigAudioStream
 }
 
 /**
@@ -266,8 +336,8 @@ interface AudioTracksTableProps {
     codec_name: string;
     bit_rate: number;
   }[];
-  audioFormData?: AudioFormDataProps;
-  setAudioFormData: Dispatch<SetStateAction<AudioFormDataProps | undefined>>;
+  audioFormData?: AudioFormData;
+  setAudioFormData: Dispatch<SetStateAction<AudioFormData>>;
   disabled?: boolean;
 }
 

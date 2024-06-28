@@ -5,13 +5,13 @@ import {FormEventHandler, useEffect, useState} from "react";
 import AudioTracksTable from "@/pages/stream-details/audio/AudioTracksTable";
 import {streamStore} from "@/stores";
 import {flowResult} from "mobx";
-import {AudioFormDataProps} from "components/stream";
+import {AudioFormData} from "components/stream";
 import Button from "@/components/common/Button";
 
 const AudioPanel = observer(() => {
   const params = useParams();
   const [audioTracks, setAudioTracks] = useState([]);
-  const [formData, setFormData] = useState<AudioFormDataProps>();
+  const [formData, setFormData] = useState<AudioFormData>({});
   const [applyingChanges, setApplyingChanges] = useState(false);
 
   const LoadConfigData = async () => {
@@ -31,14 +31,18 @@ const AudioPanel = observer(() => {
 
   const HandleSubmit: FormEventHandler<HTMLFormElement> = async(event) => {
     event.preventDefault();
+    if(!params.id) { return; }
+
     try {
       setApplyingChanges(true);
 
-      // await streamStore.UpdateStreamAudioSettings({
-      //   objectId: params.id,
-      //   slug,
-      //   audioData: formData
-      // });
+      const slug = streamStore.StreamIdToSlug({objectId: params.id});
+
+      await flowResult(streamStore.UpdateStreamAudioSettings({
+        objectId: params.id,
+        slug,
+        audioData: formData
+      }));
 
       await LoadConfigData();
 

@@ -1,3 +1,3 @@
 export * from "./stream";
 export * from "./ingest";
-export * from "./misc";
+export * from "./components";

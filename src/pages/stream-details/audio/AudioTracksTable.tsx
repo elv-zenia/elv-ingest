@@ -3,7 +3,7 @@ import {DataTable} from "mantine-datatable";
 import {Checkbox, Select, Text, TextInput} from "@mantine/core";
 import {AudioBitrateReadable, AudioCodec} from "@/utils/helpers";
 import {RECORDING_BITRATE_OPTIONS} from "@/utils/constants";
-import {AudioFormDataProps, AudioTracksTableProps} from "components/stream";
+import {AudioFormData, AudioTracksTableProps} from "components/stream";
 
 const AudioTracksTable = observer(({
   records,
@@ -11,14 +11,14 @@ const AudioTracksTable = observer(({
   setAudioFormData,
   disabled
 }: AudioTracksTableProps) => {
-  const HandleFormChange = ({index, property, value}: {index: number, property: keyof AudioFormDataProps[number], value: string | boolean | number | null | undefined}) => {
-    const audioIndexSpecific: AudioFormDataProps[number] = audioFormData[index];
+  const HandleFormChange = ({index, property, value}: {index: number, property: keyof AudioFormData[number], value: string | boolean | number | null | undefined}) => {
+    const audioIndexSpecific: AudioFormData[number] = audioFormData[index];
 
     if(Object.hasOwn(audioIndexSpecific, property)) {
       (audioIndexSpecific as Record<typeof property, typeof value>)[property] = value;
     }
 
-    const formValue: AudioFormDataProps = {
+    const formValue: AudioFormData = {
       ...audioFormData || {},
       [index]: audioIndexSpecific
     };
@@ -107,16 +107,16 @@ const AudioTracksTable = observer(({
                 <Select
                   label=""
                   style={{minWidth: "125px"}}
-                  data={RECORDING_BITRATE_OPTIONS}
+                  data={RECORDING_BITRATE_OPTIONS.map(item => ({label: item.label, value: item.value.toString()}))}
                   disabled={disabled}
                   onChange={(value) => {
                     HandleFormChange({
                       index: item.stream_index,
                       property: "recording_bitrate",
-                      value: value?.toString()
+                      value: parseInt(value as string)
                     });
                   }}
-                  value={audioFormData[item.stream_index].recording_bitrate}
+                  value={audioFormData[item.stream_index].recording_bitrate.toString()}
                 />
               )
             },

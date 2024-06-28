@@ -1,13 +1,13 @@
 import {Box, Text, Group} from "@mantine/core";
 import classes from "@/assets/stylesheets/StatusText.module.css";
-import {Quality, Status} from "components/stream";
+import {Quality, StatusType} from "components/stream";
 import {QUALITY_MAP, STATUS_TEXT} from "@/utils/constants";
 import {StatusIndicator} from "@/utils/helpers";
 import CircleFilledIcon from "@/assets/icons/CircleFilledIcon";
 import CircleAlertIcon from "@/assets/icons/CircleAlertIcon";
 
 interface StatusTextProps {
-  status: Status;
+  status: StatusType;
   quality?: Quality;
   withBorder?: boolean;
 }

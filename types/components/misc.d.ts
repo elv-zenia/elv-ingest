@@ -1,9 +1,10 @@
-
-/**
- * Represents the properties of an Icon component.
- */
-interface IconProps {
-  className?: string;
-  color?: string;
-  size?: string;
+interface Link {
+  "."?: {
+    "auto_update": {
+      "tag": string;
+    },
+    "container": string;
+  };
+  "/"?: string;
+  order?: number;
 }

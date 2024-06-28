@@ -1,16 +1,21 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "@/stores/index";
 import {
-  AudioFormDataProps,
-  // AudioStreamMapProps,
-  AudioStreamProps,
-  LiveRecordingConfigProps,
-  LiveRecordingCopiesProps,
-  StatusProps,
+  AudioFormData,
+  AudioStreamCustomSettingsPayload,
+  // AudioStreamMap,
+  AudioStream,
+  LiveRecording,
+  LiveRecordingCopies,
+  ProbeInfo,
+  Status,
   StreamMap,
-  StreamProps
+  Stream,
+  LiveRecordingConfig,
+  // LiveRecordingConfigAudioStream
 } from "components/stream";
-import {RECORDING_BITRATE_OPTIONS} from "@/utils/constants";
+import {ENCRYPTION_OPTIONS, RECORDING_BITRATE_OPTIONS} from "@/utils/constants";
+import {CreateLink} from "@/utils/helpers";
 
 interface ContentProps {
   title: string;
@@ -28,6 +33,7 @@ class StreamStore {
   rootStore!: RootStore;
   tenantId = "";
   siteId = "";
+  siteLibraryId = "";
   contentTypes: ContentProps | Record<string,never> = {};
   siteObjects: SiteObjectProps | Record<string,never> = {};
   streams: StreamMap = {};
@@ -119,9 +125,12 @@ class StreamStore {
         "content_types/title"
       ]
     });
-    console.log("response", response);
 
     this.siteId = response?.sites?.live_streams;
+
+    if(!this.siteLibraryId) {
+      this.siteLibraryId = yield this.client.ContentObjectLibraryId({objectId: this.siteId});
+    }
   }
 
   *LoadAllStreamData(): unknown {
@@ -218,13 +227,13 @@ class StreamStore {
     stopLro=false,
     showParams=false,
     update=false
-  }: {objectId: string, slug?: string, stopLro?: boolean, showParams?: boolean, update?: boolean}): Promise<StatusProps> | Generator<StatusProps> {
+  }: {objectId: string, slug?: string, stopLro?: boolean, showParams?: boolean, update?: boolean}): Promise<Status> | Generator<Status> {
     try {
       const response = (yield this.client.StreamStatus({
         name: objectId,
         stopLro,
         showParams
-      })) as StatusProps;
+      })) as Status;
 
       if(update) {
         if(!slug) {
@@ -251,7 +260,7 @@ class StreamStore {
     }
   }
 
-  *LoadStreamData({objectId, libraryId}: {objectId: string, libraryId: string}): Generator<StreamProps> | Promise<StreamProps> {
+  *LoadStreamData({objectId, libraryId}: {objectId: string, libraryId?: string}): Generator<Stream> | Promise<Stream> {
     try {
       if(!libraryId) {
         libraryId = (yield this.client.ContentObjectLibraryId({objectId})) as string;
@@ -339,7 +348,7 @@ class StreamStore {
     }
   }
 
-  *LoadEdgeWriteTokenData({objectId, libraryId}: {objectId: string, libraryId?: string}): Generator<LiveRecordingCopiesProps> | Promise<LiveRecordingCopiesProps> {
+  *LoadEdgeWriteTokenData({objectId, libraryId}: {objectId: string, libraryId?: string}): Generator<LiveRecordingCopies> | Promise<LiveRecordingCopies> {
     try {
       if(!libraryId) {
         libraryId = yield this.client.ContentObjectLibraryId({objectId});
@@ -359,7 +368,7 @@ class StreamStore {
         writeToken: edgeWriteToken,
         metadataSubtree: "live_recording",
         select: ["recordings", "recording_config"]
-      }) as LiveRecordingConfigProps;
+      }) as LiveRecording;
 
       return {
         // First stream recording start time
@@ -375,7 +384,7 @@ class StreamStore {
   *LoadStreamProbeData({
     objectId,
     libraryId
-  }: {objectId?: string, libraryId?: string}): Generator<{ audioData: AudioFormDataProps, audioStreams: object[]}> | Promise<{ audioData: AudioFormDataProps, audioStreams: object[]}> {
+  }: {objectId?: string, libraryId?: string}): Generator<{ audioData: AudioFormData, audioStreams: object[]}> | Promise<{ audioData: AudioFormData, audioStreams: object[]}> {
     try {
       if(!libraryId) {
         libraryId = yield this.client.ContentObjectLibraryId({objectId});
@@ -406,20 +415,20 @@ class StreamStore {
         metadataSubtree: "live_recording_config/audio"
       });
 
-      const audioStreams: AudioStreamProps[] = (probeMetadata.streams || []).filter((stream: AudioStreamProps) => stream.codec_type === "audio");
+      const audioStreams: AudioStream[] = (probeMetadata.streams || []).filter((stream: AudioStream) => stream.codec_type === "audio");
 
       // Map used for form data
-      const audioData: AudioFormDataProps = {};
+      const audioData: AudioFormData = {};
       audioStreams.forEach(spec => {
         const audioConfigForIndex = audioConfig && audioConfig[spec.stream_index] ? audioConfig[spec.stream_index] : {};
 
-        const initBitrate = RECORDING_BITRATE_OPTIONS.map(option => option.value).includes(spec.bit_rate) ? spec.bit_rate : "192000";
+        const initBitrate = RECORDING_BITRATE_OPTIONS.map(option => option.value).includes(spec.bit_rate) ? spec.bit_rate : 192000;
 
         audioData[spec.stream_index] = {
           bitrate: spec.bit_rate,
           codec: spec.codec_name,
           record: Object.hasOwn(audioConfigForIndex, "record") ? audioConfigForIndex.record : true,
-          recording_bitrate: initBitrate.toString(),
+          recording_bitrate: initBitrate,
           recording_channels: spec.channels,
           playout: Object.hasOwn(audioConfigForIndex, "playout") ? audioConfigForIndex.playout : true,
           playout_label: audioConfigForIndex.playout_label || `Audio ${spec.stream_index}`
@@ -435,6 +444,94 @@ class StreamStore {
     }
   }
 
+  *ConfigureStream({
+    objectId,
+    slug,
+    probeMetadata
+  }: {objectId: string, slug: string, probeMetadata: ProbeInfo}): Generator<unknown> {
+    try {
+      const libraryId = yield this.client.ContentObjectLibraryId({objectId});
+      const liveRecordingConfig = (yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "live_recording_config",
+        select: [
+          "input/audio/stream_index",
+          "input/audio/stream",
+          "output/audio/bitrate",
+          "output/audio/channel_layout",
+          "part_ttl",
+          "drm",
+          "drm_type",
+          "audio"
+        ]
+      })) as LiveRecordingConfig;
+      const customSettings: Partial<AudioStreamCustomSettingsPayload> = {};
+
+      const edgeWriteToken = (yield this.client.ContentObjectMetadata({
+        libraryId,
+        objectId,
+        metadataSubtree: "live_recording/fabric_config/edge_write_token"
+      })) as string;
+
+      // Config api will override meta containing edge write token
+      if(edgeWriteToken) {
+        customSettings["edge_write_token"] = edgeWriteToken;
+      }
+
+      if(liveRecordingConfig.part_ttl) {
+        customSettings["part_ttl"] = liveRecordingConfig.part_ttl;
+      }
+
+      if(liveRecordingConfig.audio) {
+        // Remove audio tracks with a falsey record property
+        Object.keys(liveRecordingConfig.audio).forEach((audioIndex) => {
+          if(!liveRecordingConfig.audio?.[audioIndex].record) {
+            delete liveRecordingConfig.audio?.[audioIndex];
+          }
+        });
+      }
+
+      customSettings["audio"] = liveRecordingConfig.audio ? liveRecordingConfig.audio : undefined;
+
+      yield this.client.StreamConfig({name: objectId, customSettings, probeMetadata});
+
+      if(liveRecordingConfig?.drm) {
+        const drmOption = liveRecordingConfig?.drm_type ? ENCRYPTION_OPTIONS.find(option => option.value === liveRecordingConfig.drm_type) : null;
+
+        yield this.client.StreamInitialize({
+          name: objectId,
+          drm: liveRecordingConfig?.drm === "clear" ? false : true,
+          format: drmOption?.format.join(",")
+        });
+      }
+
+      // // Update stream link in site after stream configuration
+      yield this.UpdateStreamLink({objectId, slug});
+
+      const response = (yield this.LoadStreamStatus({
+        objectId
+      })) as Status;
+
+      const streamDetails = (yield this.LoadStreamData({
+        objectId
+      })) as Stream;
+
+      this.UpdateStream({
+        key: slug,
+        value: {
+          status: response.state,
+          warnings: response.warnings,
+          quality: response.quality,
+          ...streamDetails
+        }
+      });
+    } catch(error) {
+      console.error("Unable to configure stream", error);
+      return {};
+    }
+  }
+
   UpdateStreams({streams}: {streams: StreamMap}) {
     this.streams = streams;
   }
@@ -447,6 +544,80 @@ class StreamStore {
       ...value,
       slug: key
     };
+  }
+
+  *UpdateStreamLink({objectId, slug}: {objectId: string, slug: string}): Generator<void> {
+    try {
+      const originalLink = (yield this.client.ContentObjectMetadata({
+        libraryId: this.siteLibraryId,
+        objectId: this.siteId,
+        metadataSubtree: `public/asset_metadata/live_streams/${slug}`,
+      })) as Link;
+
+      const link = CreateLink({
+        targetHash: (yield this.client.LatestVersionHash({objectId})) as string,
+        options: originalLink
+      });
+
+      const {writeToken} = (yield this.client.EditContentObject({
+        libraryId: this.siteLibraryId,
+        objectId: this.siteId
+      })) as EditContentObjectProps;
+
+      yield this.client.ReplaceMetadata({
+        libraryId: this.siteLibraryId,
+        objectId: this.siteId,
+        writeToken,
+        metadataSubtree: `public/asset_metadata/live_streams/${slug}`,
+        metadata: link
+      });
+
+      yield this.client.FinalizeContentObject({
+        libraryId: this.siteLibraryId,
+        objectId: this.siteId,
+        writeToken,
+        commitMessage: "Update stream link",
+        awaitCommitConfirmation: true
+      });
+    } catch(error) {
+      console.error("Unable to update stream link", error);
+    }
+  }
+
+  *UpdateStreamAudioSettings({objectId, slug, audioData}: {objectId: string, slug: string, audioData: AudioFormData}): Generator<unknown> {
+    const libraryId = yield this.client.ContentObjectLibraryId({objectId});
+    const {writeToken} = (yield this.client.EditContentObject({
+      libraryId,
+      objectId
+    })) as EditContentObjectProps;
+
+    yield this.client.ReplaceMetadata({
+      libraryId,
+      objectId,
+      writeToken,
+      metadataSubtree: "live_recording_config/audio",
+      metadata: audioData
+    });
+
+    yield this.client.FinalizeContentObject({
+      libraryId,
+      objectId,
+      writeToken,
+      commitMessage: "Update metadata",
+      awaitCommitConfirmation: true
+    });
+
+    const probeMetadata = (yield this.client.ContentObjectMetadata({
+      libraryId,
+      objectId,
+      metadataSubtree: "live_recording_config/probe_info"
+    })) as ProbeInfo;
+
+    yield this.ConfigureStream({
+      objectId,
+      slug,
+      probeMetadata
+    });
   }
 
   *ListenForUpdate({libraryId, objectId}: {libraryId?: string, objectId: string}): Generator<EventSource> | Promise<EventSource> {

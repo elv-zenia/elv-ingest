@@ -3,7 +3,7 @@ import {observer} from "mobx-react-lite";
 import SearchBar from "@/components/header/SearchBar";
 import JobsActivity from "@/components/header/JobsActivity";
 import TopActions, {ActionProps} from "@/components/header/TopActions";
-import {Status} from "components/stream";
+import {StatusType} from "components/stream";
 import StatusText from "@/components/header/StatusText";
 
 interface PageHeaderProps {
@@ -13,7 +13,7 @@ interface PageHeaderProps {
   actions?: ActionProps[];
   searchValue?: string;
   SearchValueCallback?: (arg: string) => void;
-  status?: Status
+  status?: StatusType
 }
 
 const PageHeader = observer(({

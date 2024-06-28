@@ -1,5 +1,11 @@
 import Fraction from "fraction.js";
-import {LiveConfigProps, Status, StreamProps, StreamTableSortColumns} from "components/stream";
+import {
+  AudioStreamMapPayload,
+  LiveRecordingConfig,
+  StatusType,
+  Stream,
+  StreamTableSortColumns
+} from "components/stream";
 import {STATUS_MAP} from "@/utils/constants";
 
 export const ParseLiveConfigData = ({
@@ -8,11 +14,17 @@ export const ParseLiveConfigData = ({
   encryption,
   retention,
   audioFormData
-}: {url: string, referenceUrl: string, encryption: string, retention: string, audioFormData: object}): LiveConfigProps => {
+}: {
+  url: string,
+  referenceUrl: string,
+  encryption: string,
+  retention: string,
+  audioFormData?: AudioStreamMapPayload
+}): LiveRecordingConfig => {
   const config = {
     drm: encryption.includes("drm") ? "drm" : encryption.includes("clear") ? "clear" : undefined,
     drm_type: encryption,
-    audio: audioFormData ? audioFormData : null,
+    audio: audioFormData ? audioFormData : undefined,
     part_ttl: parseInt(retention),
     url,
     reference_url: referenceUrl
@@ -46,7 +58,7 @@ export const AudioBitrateReadable = (bitrate: number): string => {
   return `${value} Kbps`;
 };
 
-export const StreamIsActive = (state: Status): boolean => {
+export const StreamIsActive = (state: StatusType): boolean => {
   let active = false;
 
   if([STATUS_MAP.STARTING, STATUS_MAP.RUNNING, STATUS_MAP.STALLED, STATUS_MAP.STOPPED].includes(state)) {
@@ -56,7 +68,7 @@ export const StreamIsActive = (state: Status): boolean => {
   return active;
 };
 
-export const StatusIndicator = (status: Status): "var(--mantine-color-elv-orange-6)" | "var(--mantine-color-elv-green-5)" | "var(--mantine-color-elv-red-4)" | "var(--mantine-color-elv-yellow-6)" | "" => {
+export const StatusIndicator = (status: StatusType): "var(--mantine-color-elv-orange-6)" | "var(--mantine-color-elv-green-5)" | "var(--mantine-color-elv-red-4)" | "var(--mantine-color-elv-yellow-6)" | "" => {
   if(status === STATUS_MAP.STOPPED) {
     return "var(--mantine-color-elv-orange-6)";
   } else if(status === STATUS_MAP.RUNNING) {
@@ -134,7 +146,7 @@ export const Pluralize = ({base, suffix="s", count}: {base: string, suffix: stri
 };
 
 export const SortTable = ({sortStatus}: {sortStatus: {direction: string, columnAccessor: string}}) => {
-  return (a: StreamProps, b: StreamProps) => {
+  return (a: Stream, b: Stream) => {
     const column = sortStatus.columnAccessor as StreamTableSortColumns;
 
     const valA = typeof a[column] === "string" ? (a[column] as string).toString().toLowerCase() : a[column];
@@ -186,4 +198,20 @@ export const AudioCodec = (value: string): string => {
   } else {
     return "--";
   }
+};
+
+export const CreateLink = ({
+  targetHash,
+  linkTarget="meta/public/asset_metadata",
+  options={},
+  autoUpdate=true
+}: {targetHash: string, linkTarget?: string, options: Link, autoUpdate?: boolean}) => {
+  return {
+    ...options,
+    ".": {
+      ...(options["."] || {}),
+      ...autoUpdate ? {"auto_update": {"tag": "latest"}} : undefined
+    },
+    "/": `/qfab/${targetHash}/${linkTarget}`
+  };
 };

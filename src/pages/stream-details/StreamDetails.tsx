@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import {streamStore} from "@/stores";
 import {Loader} from "@mantine/core";
-import {LiveRecordingCopiesProps} from "components/stream";
+import {LiveRecordingCopies} from "components/stream";
 import {useNavigate} from "react-router-dom";
 import {flowResult} from "mobx";
 import TabToolbar from "@/components/common/TabToolbar";
@@ -13,7 +13,7 @@ import AudioPanel from "@/pages/stream-details/audio/AudioPanel";
 const StreamDetails = observer(() => {
   const params = useParams();
   const [streamSlug, setStreamSlug] = useState("");
-  const [recordingData, setRecordingData] = useState<LiveRecordingCopiesProps | null>(null);
+  const [recordingData, setRecordingData] = useState<LiveRecordingCopies | null>(null);
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
 
@@ -44,7 +44,7 @@ const StreamDetails = observer(() => {
   const LoadEdgeWriteTokenData = async() => {
     const metadata = await flowResult(streamStore.LoadEdgeWriteTokenData({
       objectId: params.id!
-    })) as LiveRecordingCopiesProps;
+    })) as LiveRecordingCopies;
 
     if(metadata) {
       metadata.live_offering = (metadata.live_offering || []).map((item, i) => ({

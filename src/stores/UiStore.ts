@@ -13,7 +13,6 @@ class UiStore {
 
   SetErrorMessage = ({message}: {message: string | undefined}) => {
     this.errorMessage = message;
-    console.log("Message", this.errorMessage);
   };
 }
 

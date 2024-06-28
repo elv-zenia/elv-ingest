@@ -9,7 +9,7 @@ import PageHeader from "@/components/header/PageHeader";
 import {CODEC_TEXT, FORMAT_TEXT, STATUS_MAP} from "@/utils/constants";
 import {StreamIsActive, SanitizeUrl, VideoBitrateReadable, SortTable} from "@/utils/helpers";
 import {streamStore} from "@/stores";
-import {StreamProps} from "components/stream";
+import {Stream} from "components/stream";
 import StatusText from "@/components/header/StatusText";
 
 interface TableCellTextProps {
@@ -34,7 +34,7 @@ const TableCellText = ({fw=400, children, truncate=false, dimmed=false, size="sm
 };
 
 const Streams = observer(() => {
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<StreamProps>>({columnAccessor: "title", direction: "asc"});
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Stream>>({columnAccessor: "title", direction: "asc"});
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
   const [loading, setLoading] = useState(true);

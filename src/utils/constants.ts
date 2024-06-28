@@ -5,7 +5,7 @@ import ProgressPanel from "@/pages/create/ProgressPanel";
 import Content from "@/pages/content/Content";
 import ContentItemNew from "@/pages/content/new/ContentItemNew";
 import Streams from "@/pages/streams/Streams";
-import {Codec, Format, Quality, Status} from "components/stream";
+import {Codec, Format, Quality, StatusType} from "components/stream";
 import StreamDetails from "@/pages/stream-details/StreamDetails";
 
 export const CONTENT_COLUMNS = [
@@ -97,7 +97,14 @@ export const QUALITY_TEXT: Record<Quality, string> = {
   "degraded": "Degraded"
 };
 
-export const STATUS_TEXT: Record<Status, string> = {
+export const DRM_MAP = {
+  ALL: ["hls-sample-aes", "hls-aes128", "hls-fairplay"],
+  PUBLIC: ["hls-sample-aes", "hls-aes128"],
+  FAIRPLAY: ["hls-fairplay"],
+  CLEAR: ["hls-clear"]
+};
+
+export const STATUS_TEXT: Record<StatusType, string> = {
   unconfigured: "Not Configured",
   uninitialized: "Uninitialized",
   initialized: "Initialized",
@@ -110,10 +117,17 @@ export const STATUS_TEXT: Record<Status, string> = {
 };
 
 export const RECORDING_BITRATE_OPTIONS = [
-  {label: "512 Kbps", value: "512000"},
-  {label: "384 Kbps", value: "384000"},
-  {label: "256 Kbps", value: "256000"},
-  {label: "192 Kbps", value: "192000"},
-  {label: "128 Kbps", value: "128000"},
-  {label: "48 Kbps", value: "48000"}
+  {label: "512 Kbps", value: 512000},
+  {label: "384 Kbps", value: 384000},
+  {label: "256 Kbps", value: 256000},
+  {label: "192 Kbps", value: 192000},
+  {label: "128 Kbps", value: 128000},
+  {label: "48 Kbps", value: 48000}
+];
+
+export const ENCRYPTION_OPTIONS = [
+  {value: "drm-public", label: "DRM - Public Access", title: "Playout Formats - HLS Sample AES, HLS AES-128", format: DRM_MAP.PUBLIC, id: "drm-public"},
+  {value: "drm-all", label: "DRM - All Formats", title: "Playout Formats - HLS Sample AES, HLS AES-128, HLS Fairplay", format: DRM_MAP.ALL, id: "drm-all"},
+  {value: "drm-fairplay", label: "DRM - Fairplay", title: "Playout Formats - HLS Fairplay", format: DRM_MAP.FAIRPLAY, id: "drm-fairplay"},
+  {value: "clear", label: "Clear", title: "Playout Formats - HLS Clear", format: DRM_MAP.CLEAR, id: "clear"}
 ];
